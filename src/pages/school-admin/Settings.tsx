@@ -12,10 +12,70 @@ import {
 import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+
+type NotificationKey =
+  | "examCompletion"
+  | "newStudentRegistration"
+  | "lowPerformanceAlerts"
+  | "systemUpdates"
+  | "weeklyReports";
+
+const notificationItems: Array<{
+  key: NotificationKey;
+  title: string;
+  description: string;
+}> = [
+    {
+      key: "examCompletion",
+      title: "Exam Completion",
+      description: "Notify when students complete exams",
+    },
+    {
+      key: "newStudentRegistration",
+      title: "New Student Registration",
+      description: "Notify when new students register",
+    },
+    {
+      key: "lowPerformanceAlerts",
+      title: "Low Performance Alerts",
+      description: "Notify about students with low scores",
+    },
+    {
+      key: "systemUpdates",
+      title: "System Updates",
+      description: "Notify about system updates and maintenance",
+    },
+    {
+      key: "weeklyReports",
+      title: "Weekly Reports",
+      description: "Receive weekly performance summary",
+    },
+  ];
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState("school");
+  const [notificationSettings, setNotificationSettings] = useState<Record<NotificationKey, boolean>>({
+    examCompletion: true,
+    newStudentRegistration: true,
+    lowPerformanceAlerts: true,
+    systemUpdates: true,
+    weeklyReports: true,
+  });
+
+  const toastStyle = {
+    background: "#ffffff",
+    color: "#0369a1",
+    border: "1px solid #bae6fd",
+  } as const;
+
+  const handleSave = (section: string) => {
+    toast.success(`${section} saved successfully.`, {
+      style: toastStyle,
+    });
+  };
 
   return (
     <AdminLayout>
@@ -155,7 +215,10 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
+                <Button
+                  className="bg-spiritual-700 text-white hover:bg-spiritual-800"
+                  onClick={() => handleSave("School settings")}
+                >
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes
                 </Button>
@@ -226,7 +289,10 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
+                <Button
+                  className="bg-spiritual-700 text-white hover:bg-spiritual-800"
+                  onClick={() => handleSave("Profile settings")}
+                >
                   <Save className="w-4 h-4 mr-2" />
                   Update Profile
                 </Button>
@@ -243,30 +309,9 @@ const Settings = () => {
                 </h2>
 
                 <div className="space-y-4">
-                  {[
-                    {
-                      title: "Exam Completion",
-                      description: "Notify when students complete exams",
-                    },
-                    {
-                      title: "New Student Registration",
-                      description: "Notify when new students register",
-                    },
-                    {
-                      title: "Low Performance Alerts",
-                      description: "Notify about students with low scores",
-                    },
-                    {
-                      title: "System Updates",
-                      description: "Notify about system updates and maintenance",
-                    },
-                    {
-                      title: "Weekly Reports",
-                      description: "Receive weekly performance summary",
-                    },
-                  ].map((notif, index) => (
+                  {notificationItems.map((notif) => (
                     <div
-                      key={index}
+                      key={notif.key}
                       className="flex items-start justify-between p-4 border border-spiritual-200 rounded-lg"
                     >
                       <div className="flex-1">
@@ -277,10 +322,15 @@ const Settings = () => {
                           {notif.description}
                         </p>
                       </div>
-                      <input
-                        type="checkbox"
-                        className="w-5 h-5 mt-1"
-                        defaultChecked
+                      <Switch
+                        checked={notificationSettings[notif.key]}
+                        onCheckedChange={(checked) =>
+                          setNotificationSettings((prev) => ({
+                            ...prev,
+                            [notif.key]: checked,
+                          }))
+                        }
+                        aria-label={`Toggle ${notif.title}`}
                       />
                     </div>
                   ))}
@@ -288,7 +338,10 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
+                <Button
+                  className="bg-spiritual-700 text-white hover:bg-spiritual-800"
+                  onClick={() => handleSave("Notification preferences")}
+                >
                   <Save className="w-4 h-4 mr-2" />
                   Save Preferences
                 </Button>
@@ -341,7 +394,10 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
+                <Button
+                  className="bg-spiritual-700 text-white hover:bg-spiritual-800"
+                  onClick={() => handleSave("Security settings")}
+                >
                   <Save className="w-4 h-4 mr-2" />
                   Update Password
                 </Button>
@@ -399,7 +455,10 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
+                <Button
+                  className="bg-spiritual-700 text-white hover:bg-spiritual-800"
+                  onClick={() => handleSave("System configuration")}
+                >
                   <Save className="w-4 h-4 mr-2" />
                   Save Configuration
                 </Button>
