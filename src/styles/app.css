@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: 'Ginto Copilot';
+    src: url('../assets/fonts/Ginto-Copilot-Upright-Variable.woff2') format('woff2');
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+
 /* Base Styles */
 * {
     box-sizing: border-box;
@@ -13,6 +21,7 @@ html {
 
 body {
     font-family:
+        'Ginto Copilot',
         'Plus Jakarta Sans',
         system-ui,
         -apple-system,

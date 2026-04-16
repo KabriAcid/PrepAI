@@ -30,8 +30,8 @@ const Logo: React.FC<LogoProps> = ({
     const px = resolveSize(size);
     const src = showText
         ? theme === 'light'
-            ? '/logos/logo-wordmark-light.svg'
-            : '/logos/logo-wordmark-dark.svg'
+            ? '/favicon-light.png'
+            : '/favicon-dark.png'
         : '/logos/logo-mark.svg';
 
     return (

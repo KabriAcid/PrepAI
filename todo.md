@@ -1,0 +1,3 @@
+- Change the app secondary color to the yellowish sample color used in the 'best subject' banner/card in the student dashboard.
+- Page title should be directly in the main content not in the topbar.
+- Change the app

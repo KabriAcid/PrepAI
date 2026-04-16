@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Settings as SettingsIcon, User, Bell, Lock, Eye, EyeOff } from 'lucide-react'
+import { Settings as SettingsIcon, User, Bell, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
 import Card from '@/components/ui/card'
@@ -50,10 +50,16 @@ const Settings: React.FC = () => {
     setPreferences(prev => ({ ...prev, [name]: value }))
   }
 
+  const primaryButtonClass = 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-medium hover:from-primary-600 hover:to-primary-700'
+
   const accountTab = (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-      <Card className="p-4 sm:p-6">
-        <h3 className="mb-6 font-bold text-spiritual-900">Personal Information</h3>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-12"
+    >
+      <Card className="p-4 sm:p-6 xl:col-span-7">
+        <h3 className="mb-4 text-base font-bold text-spiritual-900 sm:mb-6 sm:text-lg">Personal Information</h3>
         <div className="space-y-4">
           <Input
             label="Full Name"
@@ -80,16 +86,16 @@ const Settings: React.FC = () => {
             value={formData.school}
             onChange={handleInputChange}
           />
-          <Button variant="primary" fullWidth>
+          <Button variant="primary" fullWidth className={primaryButtonClass}>
             Save Changes
           </Button>
         </div>
       </Card>
 
-      <Card className="p-4 sm:p-6">
-        <h3 className="mb-6 font-bold text-spiritual-900">Change Password</h3>
-        <div className="space-y-4">
-          <div>
+      <div className="space-y-4 sm:space-y-6 xl:col-span-5">
+        <Card className="p-4 sm:p-6">
+          <h3 className="mb-4 text-base font-bold text-spiritual-900 sm:mb-6 sm:text-lg">Change Password</h3>
+          <div className="space-y-4">
             <Input
               label="Current Password"
               name="currentPassword"
@@ -97,8 +103,6 @@ const Settings: React.FC = () => {
               value={formData.currentPassword}
               onChange={handleInputChange}
             />
-          </div>
-          <div>
             <Input
               label="New Password"
               name="newPassword"
@@ -109,45 +113,45 @@ const Settings: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-spiritual-600 hover:text-spiritual-700"
+                  className="text-spiritual-600 transition-colors hover:text-spiritual-700"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               }
             />
+            <Input
+              label="Confirm Password"
+              name="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+            />
+            <Button variant="primary" fullWidth className={primaryButtonClass}>
+              Update Password
+            </Button>
           </div>
-          <Input
-            label="Confirm Password"
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-          />
-          <Button variant="primary" fullWidth>
-            Update Password
-          </Button>
-        </div>
-      </Card>
+        </Card>
 
-      <Card className="p-4 sm:p-6 border-l-4 border-l-error-500">
-        <h3 className="mb-4 font-bold text-error-600">Danger Zone</h3>
-        <p className="mb-4 text-sm text-spiritual-700">
-          Once you delete your account, there is no going back. Please be certain.
-        </p>
-        <Button variant="danger" fullWidth>
-          Delete Account
-        </Button>
-      </Card>
+        <Card className="border-l-4 border-l-error-500 p-4 sm:p-6">
+          <h3 className="mb-3 text-base font-bold text-error-600 sm:mb-4 sm:text-lg">Danger Zone</h3>
+          <p className="mb-4 text-sm text-spiritual-700 sm:text-[15px]">
+            Once you delete your account, there is no going back. Please be certain.
+          </p>
+          <Button variant="danger" fullWidth className="bg-error-600 text-white shadow-medium hover:bg-error-700">
+            Delete Account
+          </Button>
+        </Card>
+      </div>
     </motion.div>
   )
 
   const notificationsTab = (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 sm:space-y-6">
       <Card className="p-4 sm:p-6">
-        <h3 className="mb-6 font-bold text-spiritual-900">Notification Preferences</h3>
-        <div className="space-y-4">
+        <h3 className="mb-4 text-base font-bold text-spiritual-900 sm:mb-6 sm:text-lg">Notification Preferences</h3>
+        <div className="space-y-3 sm:space-y-4">
           {Object.entries(notifications).map(([key, value]) => (
-            <div key={key} className="flex items-center justify-between p-3 hover:bg-spiritual-50 rounded-lg transition-colors">
+            <div key={key} className="flex items-center justify-between rounded-lg p-3 transition-colors hover:bg-spiritual-50 sm:p-4">
               <label className="flex items-center gap-3 flex-1">
                 <input
                   type="checkbox"
@@ -155,7 +159,7 @@ const Settings: React.FC = () => {
                   onChange={() => handleNotificationChange(key as keyof typeof notifications)}
                   className="rounded-lg"
                 />
-                <span className="font-medium text-spiritual-900 capitalize">
+                <span className="text-sm font-medium capitalize text-spiritual-900 sm:text-base">
                   {key.replace(/([A-Z])/g, ' $1').trim()}
                 </span>
               </label>
@@ -166,7 +170,7 @@ const Settings: React.FC = () => {
       </Card>
 
       <Card className="p-4 sm:p-6 bg-gradient-to-r from-primary-50 to-secondary-50">
-        <p className="text-sm text-spiritual-700">
+        <p className="text-sm text-spiritual-700 sm:text-[15px]">
           <strong>Tip:</strong> Disable notifications you don't need to reduce distractions and improve focus.
         </p>
       </Card>
@@ -174,9 +178,9 @@ const Settings: React.FC = () => {
   )
 
   const preferencesTab = (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 sm:space-y-6">
       <Card className="p-4 sm:p-6">
-        <h3 className="mb-6 font-bold text-spiritual-900">Study Preferences</h3>
+        <h3 className="mb-4 text-base font-bold text-spiritual-900 sm:mb-6 sm:text-lg">Study Preferences</h3>
         <div className="space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium text-spiritual-700">Theme</label>
@@ -220,7 +224,7 @@ const Settings: React.FC = () => {
             </select>
           </div>
 
-          <Button variant="primary" fullWidth>
+          <Button variant="primary" fullWidth className={primaryButtonClass}>
             Save Preferences
           </Button>
         </div>
@@ -236,19 +240,13 @@ const Settings: React.FC = () => {
 
   return (
     <Layout title="Settings" streak={7}>
-      <div className="space-y-6 px-3 sm:px-6 lg:px-8">
-        <Card className="p-4 sm:p-6">
+      <div className="mx-auto w-full max-w-7xl space-y-4 px-3 sm:space-y-6 sm:px-6 lg:px-8">
+        <Card className="p-3 sm:p-6">
           <Tabs tabs={tabs} defaultTab="account" />
         </Card>
       </div>
     </Layout>
   )
 }
-
-const Danger = ({ variant }: { variant: string }) => (
-  <Button variant={variant as any} fullWidth>
-    Delete Account
-  </Button>
-)
 
 export default Settings
