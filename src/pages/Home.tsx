@@ -211,7 +211,7 @@ const Home: React.FC = () => {
                             <div className="mx-auto w-full max-w-md">
                                 <div className="relative rounded-3xl bg-white/90 p-8 shadow-strong backdrop-blur-sm">
                                     <div className="space-y-4 text-center">
-                                        <div className="mx-auto flex h-20 w-20 animate-bounce-gentle items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500">
+                                        <div className="mx-auto flex h-20 w-20 animate-bounce-gentle items-center justify-center rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700">
                                             <BookOpen className="h-10 w-10 text-white" />
                                         </div>
                                         <h3 className="text-xl font-bold text-spiritual-900">
@@ -252,7 +252,7 @@ const Home: React.FC = () => {
                                 className="space-y-2 text-center"
                             >
                                 <div
-                                    className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-secondary-100 ${stat.color}`}
+                                    className={`mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-100 to-primary-300 ${stat.color}`}
                                 >
                                     <stat.icon className="h-6 w-6" />
                                 </div>
@@ -368,7 +368,7 @@ const Home: React.FC = () => {
             </section>
 
             {/* CTA Section */}
-            <section className="bg-gradient-to-r from-primary-600 to-secondary-600 py-16">
+            <section className="bg-gradient-to-r from-primary-600 to-primary-800 py-16">
                 <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}

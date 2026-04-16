@@ -106,13 +106,6 @@ const Settings: React.FC = () => {
   return (
     <Layout title="Settings" streak={7}>
       <div className="space-y-6 px-3 sm:px-6 lg:px-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-spiritual-900">Settings</h1>
-          <p className="mt-1 text-sm text-spiritual-600">
-            Manage your account profile, notifications, and study preferences.
-          </p>
-        </div>
-
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="rounded-xl border border-white/20 bg-white/90 p-2 shadow-soft backdrop-blur-sm">
             <TabsList className="grid w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-4">

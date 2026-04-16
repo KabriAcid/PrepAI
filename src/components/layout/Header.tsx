@@ -4,11 +4,10 @@ import clsx from 'clsx'
 import Logo from '@/components/Logo'
 
 interface HeaderProps {
-  title?: string
   streak?: number
 }
 
-const Header: React.FC<HeaderProps> = ({ title = 'Dashboard', streak = 7 }) => {
+const Header: React.FC<HeaderProps> = ({ streak = 7 }) => {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
 
@@ -21,9 +20,7 @@ const Header: React.FC<HeaderProps> = ({ title = 'Dashboard', streak = 7 }) => {
   return (
     <header className="sticky top-0 z-30 border-b border-spiritual-200 bg-white/90 backdrop-blur-md">
       <div className="flex items-center justify-between gap-3 px-3 sm:px-6 lg:px-8 py-3 sm:py-4 lg:ml-72">
-        <h1 className="hidden lg:block text-2xl font-bold text-spiritual-900">{title}</h1>
-
-        <div className="flex-1 lg:flex-none" />
+        <div className="flex-1" />
 
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-warning-50 to-orange-50 px-3 py-2">
