@@ -113,7 +113,7 @@ const Dashboard: React.FC = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Welcome back, kabriacid01! 👋</h2>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Welcome back, kabriacid01. Ready for today's progress?</h2>
               <p className="mt-2 text-sm sm:text-base text-white/90">Ready to ace your exams? Let's keep the momentum going!</p>
             </div>
             <div className="hidden md:block opacity-20">

@@ -121,28 +121,6 @@ const Home: React.FC = () => {
                         {/* Logo */}
                         <Logo size="md" />
 
-                        {/* Navigation Links */}
-                        <div className="hidden items-center space-x-8 md:flex">
-                            <a
-                                href="#featured-exams"
-                                className="text-spiritual-600 transition-colors hover:text-primary-600"
-                            >
-                                Exams
-                            </a>
-                            <a
-                                href="#"
-                                className="text-spiritual-600 transition-colors hover:text-primary-600"
-                            >
-                                About
-                            </a>
-                            <a
-                                href="#"
-                                className="text-spiritual-600 transition-colors hover:text-primary-600"
-                            >
-                                Contact
-                            </a>
-                        </div>
-
                         {/* Auth Buttons */}
                         <div className="flex items-center space-x-4">
                             <Link
@@ -180,9 +158,9 @@ const Home: React.FC = () => {
                             </div>
 
                             <h1 className="text-5xl font-bold leading-tight text-spiritual-900 md:text-6xl">
-                                Master Your
+                                Study with confidence.
                                 <span className="text-gradient block">
-                                    Exam Preparation
+                                    Perform at your best.
                                 </span>
                             </h1>
 
