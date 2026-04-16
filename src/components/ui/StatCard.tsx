@@ -4,11 +4,12 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 
 interface StatCardProps {
   title: string;
-  value: string;
+  value: string | number;
   subtitle?: string;
   icon: LucideIcon;
   trend?: {
-    value: number;
+    value: string | number;
+    label?: string;
     isPositive: boolean;
   };
   delay?: number;
@@ -27,57 +28,43 @@ const StatCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}
-      className="stat-card group relative bg-gradient-to-br from-primary/30 via-primary/20 to-card rounded-xl p-6 overflow-hidden"
+      className="rounded-xl border border-spiritual-200 bg-white p-5 shadow-soft"
     >
-      {/* Decorative Gradient Circles */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-
-      {/* Content */}
-      <div className="relative">
-        {/* Top Section: Title/Value (Left) + Icon (Right) */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h3 className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-              {title}
-            </h3>
-            <p className="text-2xl md:text-3xl font-display font-bold text-foreground">
-              {value}
-            </p>
-          </div>
-
-          <div className="ml-4 p-3 rounded-xl bg-accent/20 group-hover:bg-accent/30 transition-colors flex-shrink-0">
-            <Icon className="w-6 h-6 text-accent" />
-          </div>
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <h3 className="mb-1 text-xs uppercase tracking-wide text-spiritual-500">
+            {title}
+          </h3>
+          <p className="text-2xl font-bold text-spiritual-900 md:text-3xl">
+            {value}
+          </p>
         </div>
 
-        {/* Bottom Section: Subtitle (Left) + Trend (Right) */}
-        <div className="flex items-end justify-between pt-3">
-          {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          )}
-
-          {trend && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: delay + 0.2 }}
-              className={`flex items-center gap-1.5 text-sm font-semibold ml-auto ${
-                trend.isPositive ? "text-success" : "text-destructive"
-              }`}
-            >
-              {trend.isPositive ? (
-                <TrendingUp className="w-4 h-4" />
-              ) : (
-                <TrendingDown className="w-4 h-4" />
-              )}
-              <span>
-                {trend.isPositive ? "+" : ""}
-                {trend.value}%
-              </span>
-            </motion.div>
-          )}
+        <div className="ml-3 rounded-lg bg-primary-50 p-2.5">
+          <Icon className="h-5 w-5 text-primary-600" />
         </div>
+      </div>
+
+      <div className="mt-3 flex items-end justify-between border-t border-spiritual-100 pt-3">
+        <p className="text-xs text-spiritual-500">{subtitle ?? ' '}</p>
+        {trend && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: delay + 0.15 }}
+            className={`ml-auto flex items-center gap-1 text-xs font-semibold ${trend.isPositive ? "text-success-600" : "text-error-600"}`}
+          >
+            {trend.isPositive ? (
+              <TrendingUp className="h-3.5 w-3.5" />
+            ) : (
+              <TrendingDown className="h-3.5 w-3.5" />
+            )}
+            <span>
+              {trend.value}
+              {trend.label ? ` ${trend.label}` : ""}
+            </span>
+          </motion.div>
+        )}
       </div>
     </motion.div>
   );
