@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
-import { BookOpen, Clock, FileQuestion, Rocket, CheckCircle, BarChart3, Book } from 'lucide-react'
+import { BookOpen, Clock, Rocket, CheckCircle, BarChart3, Book, PlayCircle, History, Trophy } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Link, useNavigate } from 'react-router-dom'
 import Card from '@/components/ui/card'
 import Layout from '@/components/layout/Layout'
 import Button from '@/components/ui/button'
@@ -10,6 +11,7 @@ import Badge from '@/components/ui/badge'
 import { SkeletonStatCard, SkeletonExamCard, SkeletonChart } from '@/components/ui/SkeletonLoader'
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
 
   const stats = [
@@ -47,37 +49,67 @@ const Dashboard: React.FC = () => {
     },
   ]
 
-  const upcomingExams = [
+  const examWorkspace = [
     {
       id: 1,
-      title: 'JAMB Physics 2025 Mock',
-      subject: 'Physics',
-      duration: '2 hours',
+      title: 'Start Full CBT Exam',
+      description: 'Run through full instructions, subject selection, and exam summary before starting.',
+      mode: 'Timed',
       questions: 40,
-      scheduledAt: '2025-11-20 10:00 AM',
+      cta: 'Start Exam Setup',
+      to: '/student/exams/instructions',
+      badge: 'Recommended',
+      badgeClass: 'bg-primary-100 text-primary-700',
     },
     {
       id: 2,
-      title: 'WAEC English Literature',
-      subject: 'English',
-      duration: '3 hours',
-      questions: 50,
-      scheduledAt: '2025-11-22 02:00 PM',
+      title: 'Continue Last Session',
+      description: 'Jump back into your exam flow and continue from where you stopped.',
+      mode: 'Resume',
+      questions: 40,
+      cta: 'Resume Exam',
+      to: '/student/exams/summary',
+      badge: 'In Progress',
+      badgeClass: 'bg-warning-100 text-warning-700',
     },
     {
       id: 3,
-      title: 'Chemistry Fundamentals',
-      subject: 'Chemistry',
-      duration: '2.5 hours',
-      questions: 45,
-      scheduledAt: '2025-11-25 09:00 AM',
+      title: 'Quick Practice Mode',
+      description: 'Take a shorter mixed-subject practice session to sharpen speed and confidence.',
+      mode: 'Practice',
+      questions: 20,
+      cta: 'Start Practice',
+      to: '/student/exams/instructions',
+      badge: 'Quick Run',
+      badgeClass: 'bg-success-100 text-success-700',
     },
   ]
 
-  const recentResults = [
-    { exam: 'Math Quiz', score: 85, total: 100, percentage: 85, date: new Date('2025-11-10'), status: 'passed' },
-    { exam: 'Physics Test', score: 72, total: 100, percentage: 72, date: new Date('2025-11-09'), status: 'passed' },
-    { exam: 'Chemistry Test', score: 55, total: 100, percentage: 55, date: new Date('2025-11-08'), status: 'failed' },
+  const recentActivity = [
+    {
+      type: 'completed',
+      title: 'Completed JAMB Mock Session',
+      detail: 'Mathematics + English + Biology + Chemistry',
+      meta: 'Today, 10:24 AM',
+      icon: CheckCircle,
+      iconClass: 'bg-success-100 text-success-600',
+    },
+    {
+      type: 'result',
+      title: 'Result Published',
+      detail: 'Score: 78% | Rank: #15',
+      meta: 'Yesterday, 6:10 PM',
+      icon: Trophy,
+      iconClass: 'bg-warning-100 text-warning-700',
+    },
+    {
+      type: 'resume',
+      title: 'Exam Session Saved',
+      detail: 'You paused after Question 24',
+      meta: 'Yesterday, 2:37 PM',
+      icon: History,
+      iconClass: 'bg-primary-100 text-primary-600',
+    },
   ]
 
   const bestSubjectData = { subject: 'Mathematics', percentage: 88 }
@@ -152,11 +184,11 @@ const Dashboard: React.FC = () => {
           <div className="lg:col-span-2 space-y-6">
             <Card className="p-4 sm:p-5 lg:p-6">
               <div className="mb-6 flex items-center justify-between">
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-spiritual-900">Upcoming Exams</h3>
-                <a href="#" className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center gap-1">
-                  View All
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-spiritual-900">Exam Workspace</h3>
+                <Link to="/student/exams/instructions" className="text-primary-600 hover:text-primary-700 text-sm font-medium flex items-center gap-1">
+                  Open Flow
                   <span>→</span>
-                </a>
+                </Link>
               </div>
 
               <div className="space-y-3">
@@ -167,30 +199,39 @@ const Dashboard: React.FC = () => {
                     <SkeletonExamCard />
                   </>
                 ) : (
-                  upcomingExams.map((exam) => (
+                  examWorkspace.map((exam) => (
                     <motion.div
                       key={exam.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="border border-spiritual-200 rounded-lg sm:rounded-xl p-3 sm:p-4 hover:border-primary-300 hover:shadow-medium transition-all duration-300"
                     >
-                      <h4 className="font-semibold text-spiritual-900 line-clamp-2">{exam.title}</h4>
+                      <div className="flex items-start justify-between gap-3">
+                        <h4 className="font-semibold text-spiritual-900 line-clamp-2">{exam.title}</h4>
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${exam.badgeClass}`}>
+                          {exam.badge}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-spiritual-600">{exam.description}</p>
                       <div className="mt-2 flex flex-wrap gap-2">
-                        <Badge variant="neutral" size="sm" icon={<Book size={14} />}>
-                          {exam.subject}
+                        <Badge variant="neutral" size="sm" icon={<PlayCircle size={14} />}>
+                          {exam.mode}
                         </Badge>
                         <Badge variant="neutral" size="sm" icon={<Clock size={14} />}>
-                          {exam.duration}
+                          Timed Session
                         </Badge>
-                        <Badge variant="neutral" size="sm" icon={<FileQuestion size={14} />}>
+                        <Badge variant="neutral" size="sm" icon={<BookOpen size={14} />}>
                           {exam.questions} Qs
                         </Badge>
                       </div>
-                      <p className="mt-3 text-xs sm:text-sm text-spiritual-600">
-                        Scheduled: {exam.scheduledAt}
-                      </p>
-                      <Button variant="primary" size="md" fullWidth className="mt-3">
-                        Start Exam
+                      <Button
+                        variant="primary"
+                        size="md"
+                        fullWidth
+                        className="mt-3"
+                        onClick={() => navigate(exam.to)}
+                      >
+                        {exam.cta}
                       </Button>
                     </motion.div>
                   ))
@@ -240,7 +281,7 @@ const Dashboard: React.FC = () => {
             </Card>
 
             <Card className="p-4 sm:p-5 lg:p-6">
-              <h3 className="mb-6 text-lg sm:text-xl lg:text-2xl font-bold text-spiritual-900">Recent Results</h3>
+              <h3 className="mb-6 text-lg sm:text-xl lg:text-2xl font-bold text-spiritual-900">Recent Activity</h3>
               <div className="space-y-3">
                 {isLoading ? (
                   <>
@@ -249,31 +290,22 @@ const Dashboard: React.FC = () => {
                     <SkeletonExamCard />
                   </>
                 ) : (
-                  recentResults.map((result, idx) => (
+                  recentActivity.map((activity, idx) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="flex items-center gap-3 border-b border-spiritual-100 pb-3 last:border-b-0"
                     >
-                      <div className={`rounded-full p-2 ${result.status === 'passed' ? 'bg-success-100' : 'bg-error-100'}`}>
-                        {result.status === 'passed' ? (
-                          <CheckCircle size={20} className="text-success-600" />
-                        ) : (
-                          <CheckCircle size={20} className="text-error-600" />
-                        )}
+                      <div className={`rounded-full p-2 ${activity.iconClass}`}>
+                        <activity.icon size={20} />
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-spiritual-900">{result.exam}</p>
+                        <p className="font-medium text-spiritual-900">{activity.title}</p>
+                        <p className="text-xs text-spiritual-600">{activity.detail}</p>
                         <p className="text-xs text-spiritual-500">
-                          {result.date.toLocaleDateString()}
+                          {activity.meta}
                         </p>
-                      </div>
-                      <div className="text-right">
-                        <p className={`font-bold text-lg ${result.percentage >= 70 ? 'text-success-600' : 'text-error-600'}`}>
-                          {result.percentage}%
-                        </p>
-                        <p className="text-xs text-spiritual-600">{result.score}/{result.total}</p>
                       </div>
                     </motion.div>
                   ))

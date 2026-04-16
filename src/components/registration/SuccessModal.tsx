@@ -158,7 +158,7 @@ export default function SuccessModal({
                         {/* Action Button */}
                         <button
                             onClick={onClose}
-                            className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 text-sm font-bold text-white shadow-medium transition-all duration-300 hover:scale-105 hover:shadow-strong active:scale-95 sm:py-4 sm:text-base"
+                            className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 text-sm font-bold text-white shadow-medium transition-all duration-300 hover:shadow-strong sm:py-4 sm:text-base"
                         >
                             <LogIn className="mr-2 h-5 w-5" />
                             Continue to Sign In

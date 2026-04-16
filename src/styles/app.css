@@ -113,7 +113,7 @@ select {
 
 /* Button Styles */
 .btn-primary {
-    @apply rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 font-medium text-white shadow-medium transition-all duration-300 hover:scale-105 hover:shadow-strong active:scale-95;
+    @apply rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 font-medium text-white shadow-medium transition-all duration-300 hover:shadow-strong;
 }
 
 .btn-secondary {

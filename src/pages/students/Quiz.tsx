@@ -51,6 +51,8 @@ const Quiz: React.FC = () => {
   const [showAiInsight, setShowAiInsight] = useState(false);
   const [visitedQuestions, setVisitedQuestions] = useState<number[]>([0]);
 
+  const currentQuestion = getCurrentQuestion();
+
   const routeSetup = (
     location.state as { examSetup?: { selectedSubjects?: string[] } } | null
   )?.examSetup;
@@ -96,14 +98,13 @@ const Quiz: React.FC = () => {
   }, [currentQuiz, isCompleted, timeRemaining, setTimeRemaining, completeQuiz]);
 
   useEffect(() => {
-    const question = getCurrentQuestion();
-    if (question) {
-      const savedAnswer = answers[question.id];
-      setSelectedAnswer(savedAnswer ?? '');
-      setShowAiInsight(false);
-      setAiLoading(false);
-    }
-  }, [currentQuestionIndex, answers, getCurrentQuestion]);
+    if (!currentQuestion) return;
+
+    const savedAnswer = answers[currentQuestion.id];
+    setSelectedAnswer(savedAnswer ?? '');
+    setShowAiInsight(false);
+    setAiLoading(false);
+  }, [currentQuestionIndex, answers, currentQuestion?.id]);
 
   useEffect(() => {
     setVisitedQuestions((prev) =>
@@ -112,8 +113,6 @@ const Quiz: React.FC = () => {
         : [...prev, currentQuestionIndex],
     );
   }, [currentQuestionIndex]);
-
-  const currentQuestion = getCurrentQuestion();
 
   const handleAnswerSelect = (answer: string | number) => {
     if (!currentQuestion) return;

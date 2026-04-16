@@ -78,22 +78,16 @@ app.post('/api/login', (req, res) => {
     const email = String(payload.email || '').toLowerCase();
     const password = String(payload.password || '');
 
-    if (!email || !password || !accountType) {
+    if (!accountType || !['student', 'school_admin'].includes(accountType)) {
         return res.status(400).json({
-            message: 'account_type, email and password are required.',
+            message: 'account_type must be either student or school_admin.',
         });
     }
 
-    const expectedPassword = userPasswords.get(email);
-    if (expectedPassword && expectedPassword !== password) {
-        return res.status(401).json({
-            message: 'Invalid email or password.',
+    if (!isEmail(email) || !password) {
+        return res.status(400).json({
+            message: 'Valid email and password are required.',
         });
-    }
-
-    // First successful login for an email creates an in-memory credential.
-    if (!expectedPassword) {
-        userPasswords.set(email, password);
     }
 
     return res.status(200).json({

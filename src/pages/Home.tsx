@@ -386,7 +386,7 @@ const Home: React.FC = () => {
                         <div className="flex flex-col items-center justify-center gap-4 pt-2 sm:flex-row">
                             <Link
                                 to="/login"
-                                className="inline-flex items-center rounded-xl bg-white px-6 py-3 text-base font-medium text-primary-600 shadow-medium transition-all duration-300 hover:scale-105 hover:bg-primary-50 hover:shadow-strong active:scale-95"
+                                className="inline-flex items-center rounded-xl bg-white px-6 py-3 text-base font-medium text-primary-600 shadow-medium transition-all duration-300 hover:bg-primary-50 hover:shadow-strong"
                             >
                                 <Play className="mr-2 h-5 w-5" />
                                 Start Your First Test

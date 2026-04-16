@@ -3,6 +3,7 @@ import {
     COMPULSORY_SUBJECT,
     QUESTION_DISTRIBUTION,
 } from '@/utils/exam-setup';
+import { getQuestionsBySubject } from '@/utils/questionBank.mock';
 
 export type SubjectTab = {
     subject: string;
@@ -109,6 +110,27 @@ const buildExamQuestions = (
     count: number,
     prefix: string,
 ): Question[] => {
+    const bankQuestions = getQuestionsBySubject(subject);
+    if (bankQuestions.length > 0) {
+        return bankQuestions.slice(0, count).map((q, i) => {
+            const correctIndex = q.options.findIndex(
+                (option) => option.key === q.correctOptionKey,
+            );
+
+            return {
+                id: q.id || `${prefix}-${i + 1}`,
+                type: 'mcq',
+                question: q.question,
+                choices: q.options.map((option) => option.text),
+                correctAnswer: correctIndex >= 0 ? correctIndex : 0,
+                explanation: q.explanation,
+                difficulty: q.difficulty,
+                category: 'quran',
+                points: 2,
+            } as Question;
+        });
+    }
+
     const templates = getTemplatesForSubject(subject);
     return Array.from({ length: count }, (_, i) => {
         const template = templates[i % templates.length];

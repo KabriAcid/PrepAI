@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { School, UserRound } from 'lucide-react';
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/button';
 import Input from '../components/ui/input';
@@ -10,6 +10,7 @@ type AccountType = 'student' | 'school_admin';
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [accountType, setAccountType] = useState<AccountType>('student');
 
     const [formData, setFormData] = useState({
@@ -26,6 +27,14 @@ const Login: React.FC = () => {
         useState(false);
     const [isForgotLoading, setIsForgotLoading] = useState(false);
     const [forgotStatusMessage, setForgotStatusMessage] = useState('');
+
+    const redirectState =
+        location.state as
+        | {
+            redirectTo?: string;
+            examId?: number;
+        }
+        | undefined;
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -78,39 +87,20 @@ const Login: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-                body: JSON.stringify({
-                    account_type: accountType,
-                    email: formData.email,
-                    password: formData.password,
-                    remember: formData.rememberMe,
-                }),
-            });
+            // Frontend-only auth for now; backend wiring can be added later.
+            await new Promise((resolve) => setTimeout(resolve, 450));
 
-            const payload = await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                setErrors({
-                    email: payload?.errors?.email?.[0] ?? '',
-                    password: payload?.errors?.password?.[0] ?? '',
-                    general:
-                        payload?.message ?? 'Unable to sign in. Please try again.',
+            if (accountType === 'student' && redirectState?.redirectTo) {
+                navigate(redirectState.redirectTo, {
+                    state:
+                        redirectState.examId !== undefined
+                            ? { examId: redirectState.examId }
+                            : undefined,
                 });
                 return;
             }
 
-            const redirectPath =
-                payload?.data?.redirect_path ??
-                (accountType === 'school_admin'
-                    ? '/admin'
-                    : '/student/dashboard');
-
-            navigate(redirectPath);
+            navigate(accountType === 'school_admin' ? '/admin' : '/student/dashboard');
         } catch {
             setErrors({
                 general:
@@ -135,32 +125,9 @@ const Login: React.FC = () => {
         setIsForgotLoading(true);
 
         try {
-            const response = await fetch('/api/forgot-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json',
-                },
-                body: JSON.stringify({
-                    account_type: accountType,
-                    email: forgotPasswordData.email,
-                }),
-            });
-
-            const payload = await response.json().catch(() => ({}));
-            if (!response.ok) {
-                setErrors((prev) => ({
-                    ...prev,
-                    forgotEmail:
-                        payload?.message ??
-                        'Unable to send reset instructions right now.',
-                }));
-                return;
-            }
-
+            await new Promise((resolve) => setTimeout(resolve, 450));
             setForgotStatusMessage(
-                payload?.message ??
-                'If this email exists, reset instructions have been sent.',
+                'Reset instructions queued successfully. Backend email delivery will be connected later.',
             );
         } catch {
             setErrors((prev) => ({
