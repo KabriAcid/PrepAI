@@ -267,12 +267,12 @@ const Dashboard = () => {
                   {/* Rank Badge */}
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${student.rank === 1
-                        ? "bg-gradient-to-br from-warning-500 to-warning-600 text-white shadow-medium"
-                        : student.rank === 2
+                      ? "bg-gradient-to-br from-warning-500 to-warning-600 text-white shadow-medium"
+                      : student.rank === 2
+                        ? "bg-spiritual-100 text-spiritual-700"
+                        : student.rank === 3
                           ? "bg-spiritual-100 text-spiritual-700"
-                          : student.rank === 3
-                            ? "bg-spiritual-100 text-spiritual-700"
-                            : "bg-spiritual-50 text-spiritual-600"
+                          : "bg-spiritual-50 text-spiritual-600"
                       }`}
                   >
                     {student.rank === 1 ? "🥇" : student.rank === 2 ? "🥈" : student.rank === 3 ? "🥉" : student.rank}
@@ -352,8 +352,8 @@ const Dashboard = () => {
                 <div key={index} className="flex gap-3">
                   <div
                     className={`w-2 h-2 rounded-full mt-2 ${activity.type === "success"
-                        ? "bg-success-500"
-                        : "bg-primary-500"
+                      ? "bg-success-500"
+                      : "bg-primary-500"
                       }`}
                   />
                   <div className="flex-1">
