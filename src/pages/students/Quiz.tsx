@@ -14,6 +14,7 @@ import {
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/button';
 import { useQuiz } from '@/context/QuizContext';
+import { useQuestionNarration } from '@/hooks/use-question-narration';
 import {
   COMPULSORY_SUBJECT,
   createExamSetup,
@@ -21,6 +22,53 @@ import {
 } from '@/utils/exam-setup';
 
 const FALLBACK_SUBJECTS = ['Mathematics', 'Biology', 'Chemistry'];
+
+const getNarrationText = (
+  question: ReturnType<ReturnType<typeof useQuiz>['getCurrentQuestion']>,
+  readExplanation: boolean,
+) => {
+  if (!question) return '';
+
+  const optionsText =
+    question.type === 'mcq' && question.choices
+      ? question.choices
+        .map((choice, index) => `Option ${String.fromCharCode(65 + index)}. ${choice}.`)
+        .join(' ')
+      : '';
+
+  const explanationText =
+    readExplanation && question.explanation
+      ? `Explanation: ${question.explanation}.`
+      : '';
+
+  return [
+    question.question,
+    question.arabicText,
+    optionsText,
+    explanationText,
+  ]
+    .filter(Boolean)
+    .join(' ');
+};
+
+const getAnswerLabel = (
+  question: ReturnType<ReturnType<typeof useQuiz>['getCurrentQuestion']>,
+  answer: string | number | undefined,
+) => {
+  if (answer === undefined || answer === '') return 'Not answered';
+
+  if (
+    question?.type === 'mcq' &&
+    Array.isArray(question.choices) &&
+    typeof answer === 'number'
+  ) {
+    const choiceText = question.choices[answer];
+    if (!choiceText) return `Option ${String.fromCharCode(65 + answer)}`;
+    return `Option ${String.fromCharCode(65 + answer)}. ${choiceText}`;
+  }
+
+  return String(answer);
+};
 
 const Quiz: React.FC = () => {
   const navigate = useNavigate();
@@ -50,6 +98,20 @@ const Quiz: React.FC = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [showAiInsight, setShowAiInsight] = useState(false);
   const [visitedQuestions, setVisitedQuestions] = useState<number[]>([0]);
+  const [readExplanation, setReadExplanation] = useState(false);
+
+  const {
+    isSupported: isNarrationSupported,
+    isSpeaking: isNarrating,
+    isPaused: isNarrationPaused,
+    rate: narrationRate,
+    setRate: setNarrationRate,
+    error: narrationError,
+    speak,
+    pause,
+    resume,
+    stop,
+  } = useQuestionNarration();
 
   const currentQuestion = getCurrentQuestion();
 
@@ -104,7 +166,14 @@ const Quiz: React.FC = () => {
     setSelectedAnswer(savedAnswer ?? '');
     setShowAiInsight(false);
     setAiLoading(false);
+    stop();
   }, [currentQuestionIndex, answers, currentQuestion?.id]);
+
+  useEffect(() => {
+    if (isCompleted) {
+      stop();
+    }
+  }, [isCompleted, stop]);
 
   useEffect(() => {
     setVisitedQuestions((prev) =>
@@ -128,14 +197,21 @@ const Quiz: React.FC = () => {
   };
 
   const handleSubmit = () => {
+    stop();
     completeQuiz();
     setShowConfirmModal(false);
   };
 
   const handleQuit = () => {
+    stop();
     resetQuiz();
     setShowQuitModal(false);
     navigate('/student/dashboard');
+  };
+
+  const handlePlayNarration = () => {
+    const narrationText = getNarrationText(currentQuestion, readExplanation);
+    speak(narrationText);
   };
 
   const handleExplainWithAI = () => {
@@ -187,6 +263,12 @@ const Quiz: React.FC = () => {
 
   const answeredCount = Object.keys(answers).length;
   const totalQuestions = currentQuiz.questions.length;
+  const correctAnswers = currentQuiz.questions.reduce((count, question) => {
+    return answers[question.id] === question.correctAnswer ? count + 1 : count;
+  }, 0);
+  const scorePercent = totalQuestions
+    ? Math.round((correctAnswers / totalQuestions) * 100)
+    : 0;
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
   const timerProgress = Math.max(
     0,
@@ -203,30 +285,115 @@ const Quiz: React.FC = () => {
   if (isCompleted) {
     return (
       <Layout title="Take Exam" streak={7}>
-        <div className="px-3 sm:px-6 lg:px-8">
-          <div className="min-h-[60vh] flex items-center justify-center p-1 sm:p-4">
+        <div className="px-3 sm:px-6 lg:px-8 pb-6 sm:pb-10">
+          <div className="mx-auto w-full max-w-5xl space-y-5">
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="w-full max-w-lg bg-white/95 rounded-3xl p-6 sm:p-8 shadow-strong text-center"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-3xl bg-white/95 p-5 shadow-strong sm:p-7"
             >
-              <div className="w-20 h-20 bg-gradient-to-br from-success-500 to-success-600 rounded-full mx-auto mb-6 flex items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-white" />
-              </div>
-              <h2 className="text-2xl font-bold text-spiritual-900 mb-2">Exam Summary</h2>
-              <p className="text-spiritual-600 mb-6">Your responses have been recorded successfully.</p>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-success-500 to-success-600">
+                    <CheckCircle className="h-7 w-7 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-spiritual-900">Exam Summary</h2>
+                    <p className="text-spiritual-600">
+                      Your responses have been recorded. Review each question below.
+                    </p>
+                  </div>
+                </div>
 
-              <div className="mb-6 rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 text-primary-700 font-semibold">
-                Questions Answered: {answeredCount}/{totalQuestions}
+                <div className="grid grid-cols-3 gap-2 text-center sm:min-w-[280px]">
+                  <div className="rounded-xl border border-primary-200 bg-primary-50 p-2">
+                    <p className="text-xs text-primary-700">Answered</p>
+                    <p className="text-lg font-bold text-primary-700">
+                      {answeredCount}/{totalQuestions}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-success-200 bg-success-50 p-2">
+                    <p className="text-xs text-success-700">Correct</p>
+                    <p className="text-lg font-bold text-success-700">
+                      {correctAnswers}/{totalQuestions}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-secondary-200 bg-secondary-50 p-2">
+                    <p className="text-xs text-secondary-700">Score</p>
+                    <p className="text-lg font-bold text-secondary-700">{scorePercent}%</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                <Button variant="primary" onClick={() => navigate('/student/results')}>
+                  View Results
+                </Button>
+                <Button variant="secondary" onClick={() => navigate('/student/dashboard')}>
+                  Return to Dashboard
+                </Button>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="quiz-card space-y-3"
+            >
+              <div>
+                <h3 className="text-lg font-bold text-spiritual-900">Question Review</h3>
+                <p className="text-sm text-spiritual-600">
+                  Compare your selected answers with the correct answers and explanations.
+                </p>
               </div>
 
               <div className="space-y-3">
-                <Button variant="primary" className="w-full" onClick={() => navigate('/student/results')}>
-                  View Results
-                </Button>
-                <Button variant="secondary" className="w-full" onClick={() => navigate('/student/dashboard')}>
-                  Return to Dashboard
-                </Button>
+                {currentQuiz.questions.map((question, index) => {
+                  const selectedAnswerValue = answers[question.id];
+                  const isCorrect = selectedAnswerValue === question.correctAnswer;
+                  const selectedLabel = getAnswerLabel(question, selectedAnswerValue);
+                  const correctLabel = getAnswerLabel(question, question.correctAnswer);
+
+                  return (
+                    <div
+                      key={question.id}
+                      className="rounded-2xl border border-spiritual-200 bg-white p-4"
+                    >
+                      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                        <p className="font-semibold text-spiritual-900">
+                          Q{index + 1}. {question.question}
+                        </p>
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            isCorrect
+                              ? 'bg-success-100 text-success-700'
+                              : 'bg-error-100 text-error-700'
+                          }`}
+                        >
+                          {isCorrect ? 'Correct' : 'Incorrect'}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 text-sm">
+                        <p className="text-spiritual-700">
+                          <span className="font-semibold text-spiritual-900">Your answer:</span>{' '}
+                          {selectedLabel}
+                        </p>
+                        <p className="text-spiritual-700">
+                          <span className="font-semibold text-spiritual-900">Correct answer:</span>{' '}
+                          {correctLabel}
+                        </p>
+                        {question.explanation && (
+                          <p className="rounded-lg bg-spiritual-50 px-3 py-2 text-spiritual-700">
+                            <span className="font-semibold text-spiritual-900">Explanation:</span>{' '}
+                            {question.explanation}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </motion.div>
           </div>
@@ -254,6 +421,20 @@ const Quiz: React.FC = () => {
               selectedAnswer={selectedAnswer}
               onAnswerSelect={handleAnswerSelect}
               onExplainWithAI={handleExplainWithAI}
+              onPlayNarration={handlePlayNarration}
+              onPauseNarration={pause}
+              onResumeNarration={resume}
+              onStopNarration={stop}
+              isNarrationSupported={isNarrationSupported}
+              isNarrating={isNarrating}
+              isNarrationPaused={isNarrationPaused}
+              narrationRate={narrationRate}
+              onNarrationRateChange={setNarrationRate}
+              narrationError={narrationError}
+              readExplanation={readExplanation}
+              onReadExplanationToggle={() =>
+                setReadExplanation((previous) => !previous)
+              }
               showAiInsight={showAiInsight}
               aiLoading={aiLoading}
               aiInsight={aiInsight}

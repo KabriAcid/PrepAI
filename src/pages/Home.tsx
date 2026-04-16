@@ -533,7 +533,7 @@ const Home: React.FC = () => {
 
                     <div className="border-t border-spiritual-700 pt-8 text-center text-sm">
                         <p>
-                            &copy; {new Date().getFullYear()} Skool. All
+                            &copy; {new Date().getFullYear()} prepai. All
                             rights reserved.
                         </p>
                     </div>

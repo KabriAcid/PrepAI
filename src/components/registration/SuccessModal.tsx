@@ -167,10 +167,10 @@ export default function SuccessModal({
                         <p className="mt-4 text-center text-xs text-spiritual-500 sm:text-sm">
                             Need help? Contact us at{' '}
                             <a
-                                href="mailto:support@skool.ng"
+                                href="mailto:support@prepai.ng"
                                 className="text-primary-600 hover:underline"
                             >
-                                support@skool.ng
+                                support@prepai.ng
                             </a>
                         </p>
                     </motion.div>
