@@ -325,7 +325,7 @@ const Dashboard = () => {
                   key={index}
                   className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-spiritual-50 transition-all duration-300 text-left group"
                 >
-                  <div className="p-2 bg-spiritual-100 rounded-lg group-hover:scale-110 transition-transform">
+                  <div className="p-2 bg-spiritual-100 rounded-lg transition-colors group-hover:bg-spiritual-200">
                     <action.icon className={`w-5 h-5 ${action.color}`} />
                   </div>
                   <div className="flex-1">

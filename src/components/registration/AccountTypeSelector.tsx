@@ -20,7 +20,6 @@ export default function AccountTypeSelector({
                 <motion.button
                     type="button"
                     onClick={() => onSelect('student')}
-                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="group rounded-xl border-2 border-spiritual-200 p-4 transition-all duration-300 hover:border-primary-300 hover:bg-primary-50 focus:outline-none sm:rounded-2xl sm:p-6"
                 >
@@ -44,7 +43,6 @@ export default function AccountTypeSelector({
                 <motion.button
                     type="button"
                     onClick={() => onSelect('school_admin')}
-                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className="group rounded-xl border-2 border-spiritual-200 p-4 transition-all duration-300 hover:border-secondary-300 hover:bg-secondary-50 focus:outline-none sm:rounded-2xl sm:p-6"
                 >

@@ -205,7 +205,7 @@ const Support = () => {
                 className="bg-white/90 backdrop-blur-sm rounded-xl p-5 shadow-soft border border-white/20 hover:shadow-medium transition-all duration-300 group"
               >
                 <div className="flex items-start gap-3">
-                  <div className="p-3 bg-secondary/10 rounded-xl group-hover:scale-110 transition-transform">
+                  <div className="p-3 bg-secondary/10 rounded-xl transition-colors group-hover:bg-secondary/20">
                     <resource.icon className="w-6 h-6 text-secondary" />
                   </div>
                   <div>
