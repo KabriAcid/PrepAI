@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { BookOpen, Clock, FileQuestion, Filter, Search } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
-import Card from '@/components/ui/Card'
+import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
-import Badge from '@/components/ui/Badge'
+import Badge from '@/components/ui/badge'
 import Input from '@/components/ui/input'
 
 const MyExams: React.FC = () => {
@@ -219,8 +219,8 @@ const MyExams: React.FC = () => {
                 key={tab}
                 onClick={() => setSelectedTab(tab)}
                 className={`flex-1 px-4 py-3 text-sm sm:text-base font-medium transition-all duration-300 ${selectedTab === tab
-                    ? 'border-b-2 border-primary-500 text-primary-600'
-                    : 'text-spiritual-600 hover:text-spiritual-700'
+                  ? 'border-b-2 border-primary-500 text-primary-600'
+                  : 'text-spiritual-600 hover:text-spiritual-700'
                   }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}

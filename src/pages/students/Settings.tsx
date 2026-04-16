@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { Settings as SettingsIcon, User, Bell, Lock, Eye, EyeOff } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
-import Card from '@/components/ui/Card'
+import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
 import Input from '@/components/ui/input'
-import Tabs from '@/components/ui/Tabs'
+import Tabs from '@/components/ui/tabs'
 
 const Settings: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -38,7 +38,7 @@ const Settings: React.FC = () => {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleNotificationChange = (key: string) => {
+  const handleNotificationChange = (key: keyof typeof notifications) => {
     setNotifications(prev => ({
       ...prev,
       [key]: !prev[key]
@@ -152,7 +152,7 @@ const Settings: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={value}
-                  onChange={() => handleNotificationChange(key)}
+                  onChange={() => handleNotificationChange(key as keyof typeof notifications)}
                   className="rounded-lg"
                 />
                 <span className="font-medium text-spiritual-900 capitalize">

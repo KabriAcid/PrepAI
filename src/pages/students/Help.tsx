@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { HelpCircle, ChevronDown, Send, MessageCircle, BookOpen, Lightbulb } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
-import Card from '@/components/ui/Card'
+import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
 import Input from '@/components/ui/input'
 

@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { BookOpen, Clock, FileQuestion, Rocket, CheckCircle, BarChart3, Book } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
-import Card from '@/components/ui/Card'
+import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
 import StatCard from '@/components/ui/StatCard'
 import ProgressBar from '@/components/ui/ProgressBar'
-import Badge from '@/components/ui/Badge'
+import Badge from '@/components/ui/badge'
 import { SkeletonStatCard, SkeletonExamCard, SkeletonChart } from '@/components/ui/SkeletonLoader'
 
 const Dashboard: React.FC = () => {

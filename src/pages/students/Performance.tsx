@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { TrendingUp, Calendar, BookOpen, Zap } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
-import Card from '@/components/ui/Card'
-import Badge from '@/components/ui/Badge'
+import Card from '@/components/ui/card'
+import Badge from '@/components/ui/badge'
 import ProgressBar from '@/components/ui/ProgressBar'
-import Tabs from '@/components/ui/Tabs'
+import Tabs from '@/components/ui/tabs'
 
 const Performance: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'all'>('month')
@@ -255,11 +255,10 @@ const Performance: React.FC = () => {
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    timeRange === range
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${timeRange === range
                       ? 'bg-primary-500 text-white'
                       : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
-                  }`}
+                    }`}
                 >
                   {range === 'week' ? 'This Week' : range === 'month' ? 'This Month' : 'All Time'}
                 </button>

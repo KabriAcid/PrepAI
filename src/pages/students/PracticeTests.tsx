@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { BookOpen, Clock, Zap, Filter, Search, Star } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Layout from '@/components/layout/Layout'
-import Card from '@/components/ui/Card'
+import Card from '@/components/ui/card'
 import Button from '@/components/ui/button'
-import Badge from '@/components/ui/Badge'
+import Badge from '@/components/ui/badge'
 import Input from '@/components/ui/input'
 
 const PracticeTests: React.FC = () => {
@@ -220,8 +220,8 @@ const PracticeTests: React.FC = () => {
                 <button
                   onClick={() => setSelectedSubject(null)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!selectedSubject
-                      ? 'bg-primary-500 text-white'
-                      : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
                     }`}
                 >
                   All
@@ -231,8 +231,8 @@ const PracticeTests: React.FC = () => {
                     key={subject}
                     onClick={() => setSelectedSubject(subject)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedSubject === subject
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
                       }`}
                   >
                     {subject}
@@ -247,8 +247,8 @@ const PracticeTests: React.FC = () => {
                 <button
                   onClick={() => setSelectedDifficulty(null)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${!selectedDifficulty
-                      ? 'bg-primary-500 text-white'
-                      : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
+                    ? 'bg-primary-500 text-white'
+                    : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
                     }`}
                 >
                   All
@@ -258,8 +258,8 @@ const PracticeTests: React.FC = () => {
                     key={difficulty}
                     onClick={() => setSelectedDifficulty(difficulty)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${selectedDifficulty === difficulty
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
                       }`}
                   >
                     {difficulty}
