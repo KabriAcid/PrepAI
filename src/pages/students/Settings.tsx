@@ -50,8 +50,6 @@ const Settings: React.FC = () => {
     setPreferences(prev => ({ ...prev, [name]: value }))
   }
 
-  const primaryButtonClass = 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-medium hover:from-primary-600 hover:to-primary-700'
-
   const accountTab = (
     <motion.div
       initial={{ opacity: 0 }}
@@ -86,7 +84,7 @@ const Settings: React.FC = () => {
             value={formData.school}
             onChange={handleInputChange}
           />
-          <Button variant="primary" fullWidth className={primaryButtonClass}>
+          <Button variant="primary" fullWidth>
             Save Changes
           </Button>
         </div>
@@ -126,7 +124,7 @@ const Settings: React.FC = () => {
               value={formData.confirmPassword}
               onChange={handleInputChange}
             />
-            <Button variant="primary" fullWidth className={primaryButtonClass}>
+            <Button variant="primary" fullWidth>
               Update Password
             </Button>
           </div>
@@ -224,7 +222,7 @@ const Settings: React.FC = () => {
             </select>
           </div>
 
-          <Button variant="primary" fullWidth className={primaryButtonClass}>
+          <Button variant="primary" fullWidth>
             Save Preferences
           </Button>
         </div>

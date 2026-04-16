@@ -459,7 +459,6 @@ export default function Register() {
                                         <motion.button
                                             type="button"
                                             onClick={handlePreviousStep}
-                                            whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             className="btn-back w-full justify-center sm:w-auto"
                                         >
@@ -470,7 +469,6 @@ export default function Register() {
                                         <motion.button
                                             type="button"
                                             onClick={handleBackToAccountType}
-                                            whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
                                             className="btn-back w-full justify-center sm:w-auto"
                                         >

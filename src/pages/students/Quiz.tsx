@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowRight,
   CheckCircle,
-  Clock,
   Flag,
   Sparkles,
   XCircle,
@@ -187,6 +186,7 @@ const Quiz: React.FC = () => {
     answerQuestion,
     nextQuestion,
     previousQuestion,
+    goToQuestion,
     setTimeRemaining,
     completeQuiz,
     resetQuiz,
@@ -198,7 +198,9 @@ const Quiz: React.FC = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showQuitModal, setShowQuitModal] = useState(false);
   const [aiInsight, setAiInsight] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
   const [showAiInsight, setShowAiInsight] = useState(false);
+  const [visitedQuestions, setVisitedQuestions] = useState<number[]>([0]);
 
   const routeSetup = (
     location.state as { examSetup?: { selectedSubjects?: string[] } } | null
@@ -218,6 +220,23 @@ const Quiz: React.FC = () => {
     () => buildQuizFromSetup(selectedSubjects),
     [selectedSubjects],
   );
+
+  const subjectTabs = useMemo(() => {
+    const subjects = [COMPULSORY_SUBJECT, ...selectedSubjects];
+    let runningIndex = 0;
+
+    return subjects.map((subject, index) => {
+      const count =
+        index === 0
+          ? QUESTION_DISTRIBUTION[COMPULSORY_SUBJECT]
+          : QUESTION_DISTRIBUTION.additionalSubject;
+      const startIndex = runningIndex;
+      const endIndex = runningIndex + count - 1;
+      runningIndex += count;
+
+      return { subject, startIndex, endIndex };
+    });
+  }, [selectedSubjects]);
 
   useEffect(() => {
     if (!currentQuiz || currentQuiz.id !== mockQuiz.id) {
@@ -243,10 +262,19 @@ const Quiz: React.FC = () => {
     const question = getCurrentQuestion();
     if (question) {
       const savedAnswer = answers[question.id];
-      setSelectedAnswer(savedAnswer || '');
+      setSelectedAnswer(savedAnswer ?? '');
       setShowAiInsight(false);
+      setAiLoading(false);
     }
   }, [currentQuestionIndex, answers, getCurrentQuestion]);
+
+  useEffect(() => {
+    setVisitedQuestions((prev) =>
+      prev.includes(currentQuestionIndex)
+        ? prev
+        : [...prev, currentQuestionIndex],
+    );
+  }, [currentQuestionIndex]);
 
   const currentQuestion = getCurrentQuestion();
 
@@ -260,8 +288,6 @@ const Quiz: React.FC = () => {
     if (!currentQuiz) return;
     if (currentQuestionIndex < currentQuiz.questions.length - 1) {
       nextQuestion();
-    } else {
-      setShowConfirmModal(true);
     }
   };
 
@@ -273,7 +299,7 @@ const Quiz: React.FC = () => {
   const handleQuit = () => {
     resetQuiz();
     setShowQuitModal(false);
-    navigate('/student/exams/summary');
+    navigate('/student/dashboard');
   };
 
   const handleExplainWithAI = () => {
@@ -281,8 +307,8 @@ const Quiz: React.FC = () => {
 
     const optionText =
       currentQuestion.type === 'mcq' &&
-        currentQuestion.choices &&
-        typeof currentQuestion.correctAnswer === 'number'
+      currentQuestion.choices &&
+      typeof currentQuestion.correctAnswer === 'number'
         ? currentQuestion.choices[currentQuestion.correctAnswer]
         : String(currentQuestion.correctAnswer);
 
@@ -299,8 +325,13 @@ const Quiz: React.FC = () => {
       'Exam strategy: Eliminate obviously wrong options first, then compare the remaining options against the exact wording of the question.',
     ].join(' ');
 
-    setAiInsight(insight);
+    setAiLoading(true);
     setShowAiInsight(true);
+
+    window.setTimeout(() => {
+      setAiInsight(insight);
+      setAiLoading(false);
+    }, 1200);
   };
 
   if (!currentQuiz || !currentQuestion) {
@@ -321,11 +352,17 @@ const Quiz: React.FC = () => {
   const answeredCount = Object.keys(answers).length;
   const totalQuestions = currentQuiz.questions.length;
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
-  const canGoNext = selectedAnswer !== '';
   const timerProgress = Math.max(
     0,
     Math.min(100, (timeRemaining / (currentQuiz.timeLimit || 1)) * 100),
   );
+
+  const activeSubject =
+    subjectTabs.find(
+      (tab) =>
+        currentQuestionIndex >= tab.startIndex &&
+        currentQuestionIndex <= tab.endIndex,
+    )?.subject ?? COMPULSORY_SUBJECT;
 
   if (isCompleted) {
     return (
@@ -340,7 +377,7 @@ const Quiz: React.FC = () => {
               <div className="w-20 h-20 bg-gradient-to-br from-success-500 to-success-600 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <CheckCircle className="w-10 h-10 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-spiritual-900 mb-2">Exam Submitted</h2>
+              <h2 className="text-2xl font-bold text-spiritual-900 mb-2">Exam Summary</h2>
               <p className="text-spiritual-600 mb-6">Your responses have been recorded successfully.</p>
 
               <div className="mb-6 rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 text-primary-700 font-semibold">
@@ -366,7 +403,7 @@ const Quiz: React.FC = () => {
     <Layout title="Take Exam" streak={7}>
       <div className="px-3 sm:px-6 lg:px-8 pt-2 sm:pt-4 pb-2 sm:pb-8">
         <div className="w-full">
-          <div className="mb-4 rounded-2xl border border-primary-200 bg-primary-50 p-4 sm:p-5">
+          <div className="sticky top-16 z-20 mb-4 rounded-2xl border border-primary-200 bg-white/95 p-4 shadow-soft backdrop-blur-sm sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h1 className="text-xl sm:text-2xl font-extrabold text-spiritual-900">JAMB Mock CBT</h1>
@@ -377,15 +414,13 @@ const Quiz: React.FC = () => {
 
               <div className="text-left sm:text-right">
                 <p className="text-xs uppercase tracking-wider font-semibold text-primary-700">Time Remaining</p>
-                <motion.p
-                  key={timeRemaining}
-                  initial={{ opacity: 0.6, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className={`text-3xl sm:text-5xl font-extrabold leading-none ${timeRemaining <= 60 ? 'text-error-600 animate-pulse' : 'text-primary-600'}`}
+                <p
+                  className={`text-3xl sm:text-5xl font-extrabold leading-none ${
+                    timeRemaining <= 60 ? 'text-error-600' : 'text-primary-600'
+                  }`}
                 >
                   {formatTime(timeRemaining)}
-                </motion.p>
+                </p>
               </div>
             </div>
 
@@ -400,6 +435,25 @@ const Quiz: React.FC = () => {
 
           <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-4 sm:gap-6">
             <div className="space-y-6">
+              <div className="quiz-card py-3 sm:py-4">
+                <div className="flex flex-wrap gap-2">
+                  {subjectTabs.map((tab) => (
+                    <button
+                      key={tab.subject}
+                      type="button"
+                      onClick={() => goToQuestion(tab.startIndex)}
+                      className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                        tab.subject === activeSubject
+                          ? 'bg-primary-500 text-white'
+                          : 'bg-spiritual-100 text-spiritual-700 hover:bg-spiritual-200'
+                      }`}
+                    >
+                      {tab.subject}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentQuestion.id}
@@ -436,18 +490,21 @@ const Quiz: React.FC = () => {
                           {currentQuestion.choices.map((choice, index) => (
                             <button
                               key={index}
+                              type="button"
                               onClick={() => handleAnswerSelect(index)}
-                              className={`w-full p-4 text-left rounded-xl border-2 transition-colors ${selectedAnswer === index
+                              className={`w-full p-4 text-left rounded-xl border-2 transition-colors ${
+                                selectedAnswer === index
                                   ? 'border-primary-500 bg-primary-50 text-primary-700'
                                   : 'border-spiritual-200 bg-white hover:border-spiritual-300'
-                                }`}
+                              }`}
                             >
                               <div className="flex items-center space-x-3">
                                 <div
-                                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedAnswer === index
+                                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                                    selectedAnswer === index
                                       ? 'border-primary-500 bg-primary-500'
                                       : 'border-spiritual-300'
-                                    }`}
+                                  }`}
                                 >
                                   {selectedAnswer === index && (
                                     <div className="w-2 h-2 bg-white rounded-full" />
@@ -475,7 +532,15 @@ const Quiz: React.FC = () => {
 
                     {showAiInsight && (
                       <div className="rounded-xl border border-secondary-200 bg-secondary-50 p-4 text-sm leading-relaxed text-spiritual-700">
-                        {aiInsight}
+                        {aiLoading ? (
+                          <div className="space-y-2 animate-pulse">
+                            <div className="h-3 w-full rounded bg-secondary-200" />
+                            <div className="h-3 w-5/6 rounded bg-secondary-200" />
+                            <div className="h-3 w-4/6 rounded bg-secondary-200" />
+                          </div>
+                        ) : (
+                          aiInsight
+                        )}
                       </div>
                     )}
                   </div>
@@ -483,13 +548,9 @@ const Quiz: React.FC = () => {
               </AnimatePresence>
 
               <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <Button
-                  variant="secondary"
-                  onClick={() => setShowQuitModal(true)}
-                  leftIcon={<XCircle className="w-4 h-4" />}
-                >
-                  Quit Exam
-                </Button>
+                <p className="text-sm text-spiritual-600">
+                  Question {currentQuestionIndex + 1} of {totalQuestions}
+                </p>
 
                 <div className="flex gap-3 sm:justify-end">
                   <Button
@@ -500,12 +561,13 @@ const Quiz: React.FC = () => {
                     Previous
                   </Button>
 
-                  <Button variant="primary" onClick={handleNext} disabled={!canGoNext}>
+                  <Button
+                    variant="primary"
+                    onClick={handleNext}
+                    disabled={isLastQuestion}
+                  >
                     {isLastQuestion ? (
-                      <>
-                        <Flag className="w-4 h-4 mr-2" />
-                        Submit Quiz
-                      </>
+                      'Last Question Reached'
                     ) : (
                       <>
                         Next
@@ -518,6 +580,26 @@ const Quiz: React.FC = () => {
             </div>
 
             <div className="space-y-4">
+              <div className="quiz-card space-y-3">
+                <h3 className="font-semibold text-spiritual-900">Exam Actions</h3>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowQuitModal(true)}
+                  leftIcon={<XCircle className="w-4 h-4" />}
+                  fullWidth
+                >
+                  Quit Exam
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => setShowConfirmModal(true)}
+                  leftIcon={<Flag className="w-4 h-4" />}
+                  fullWidth
+                >
+                  Submit Quiz
+                </Button>
+              </div>
+
               <div className="quiz-card">
                 <h3 className="font-semibold text-spiritual-900 mb-2">Questions Answered</h3>
                 <p className="text-3xl font-extrabold text-primary-600 leading-none">
@@ -534,12 +616,17 @@ const Quiz: React.FC = () => {
                   {currentQuiz.questions.map((_, index) => (
                     <button
                       key={index}
-                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${index === currentQuestionIndex
+                      type="button"
+                      onClick={() => goToQuestion(index)}
+                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                        index === currentQuestionIndex
                           ? 'bg-primary-500 text-white'
-                          : answers[currentQuiz.questions[index].id]
+                          : answers[currentQuiz.questions[index].id] !== undefined
                             ? 'bg-success-100 text-success-700 border border-success-300'
-                            : 'bg-spiritual-100 text-spiritual-600 hover:bg-spiritual-200'
-                        }`}
+                            : visitedQuestions.includes(index)
+                              ? 'bg-warning-100 text-warning-700 border border-warning-300'
+                              : 'bg-spiritual-100 text-spiritual-600 hover:bg-spiritual-200'
+                      }`}
                     >
                       {index + 1}
                     </button>
@@ -569,7 +656,7 @@ const Quiz: React.FC = () => {
                 Continue Exam
               </Button>
               <Button variant="primary" onClick={handleSubmit} className="flex-1">
-                Submit Now
+                Submit and View Summary
               </Button>
             </div>
           </div>
