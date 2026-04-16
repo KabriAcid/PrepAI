@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { LayoutDashboard, BookOpen, Trophy, BarChart3, TrendingUp, Layers, Settings, HelpCircle, LogOut, Menu, X } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import clsx from 'clsx'
+import Logo from '@/components/Logo'
 
 const Sidebar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -63,11 +64,7 @@ const Sidebar: React.FC = () => {
         <div className="flex h-screen flex-col">
           <div className="border-b border-spiritual-200 px-3 sm:px-4 py-4 sm:py-5">
             <div className="flex items-center gap-3">
-              <img
-                src="/logos/logo-mark.svg"
-                alt="PrepAI"
-                className="h-10 w-10 rounded-lg object-contain"
-              />
+              <Logo size={40} showText={false} />
               <span className="text-xl font-bold text-spiritual-900">PrepAI</span>
             </div>
           </div>

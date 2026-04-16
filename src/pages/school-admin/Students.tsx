@@ -129,7 +129,7 @@ const Students = () => {
   const stats = [
     { 
       label: "Total Students", 
-      value: "1,234", 
+      value: "34", 
       gradient: "from-primary-500 to-primary-600",
       textColor: "text-primary",
       bgColor: "bg-primary/10"

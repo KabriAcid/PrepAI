@@ -22,8 +22,8 @@ const Dashboard = () => {
   const stats = [
     {
       label: "Total Students",
-      value: "1,234",
-      change: "+12 this week",
+      value: "34",
+      change: "+2 this week",
       icon: Users,
       iconBg: "bg-primary-100",
       iconColor: "text-primary-600",
@@ -138,7 +138,7 @@ const Dashboard = () => {
     <AdminLayout>
       <div className="space-y-6 sm:space-y-8">
         {/* Welcome Banner */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-600 to-secondary-600 p-6 text-white shadow-strong sm:rounded-3xl sm:p-8">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-700 to-spiritual-700 p-6 text-white shadow-strong sm:rounded-3xl sm:p-8">
           <div className="relative z-10">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 flex items-center gap-2">
               Welcome back, Admin! 👋

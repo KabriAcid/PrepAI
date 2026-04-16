@@ -9,6 +9,7 @@ import {
   Save,
   Upload,
 } from "lucide-react";
+import Logo from "@/components/Logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -35,35 +36,35 @@ const Settings = () => {
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 bg-transparent p-0">
               <TabsTrigger
                 value="school"
-                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-dark data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300"
+                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-spiritual-700 data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300"
               >
                 <Building className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">School</span>
               </TabsTrigger>
               <TabsTrigger
                 value="profile"
-                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-dark data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300"
+                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-spiritual-700 data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300"
               >
                 <User className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Profile</span>
               </TabsTrigger>
               <TabsTrigger
                 value="notifications"
-                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-dark data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300"
+                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-spiritual-700 data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300"
               >
                 <Bell className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Notifications</span>
               </TabsTrigger>
               <TabsTrigger
                 value="security"
-                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-dark data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300"
+                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-spiritual-700 data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300"
               >
                 <Shield className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">Security</span>
               </TabsTrigger>
               <TabsTrigger
                 value="system"
-                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-dark data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300 col-span-2 sm:col-span-1"
+                className="flex items-center justify-center gap-2 px-3 py-2.5 sm:px-4 sm:py-3 data-[state=active]:bg-spiritual-700 data-[state=active]:text-white data-[state=active]:shadow-medium rounded-lg transition-all duration-300 col-span-2 sm:col-span-1"
               >
                 <Globe className="w-4 h-4 flex-shrink-0" />
                 <span className="hidden sm:inline">System</span>
@@ -85,8 +86,8 @@ const Settings = () => {
                       School Logo
                     </label>
                     <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-                        <span className="text-white font-bold text-2xl">E</span>
+                      <div className="w-20 h-20 rounded-xl border border-spiritual-200 bg-white flex items-center justify-center">
+                        <Logo size={56} showText={false} />
                       </div>
                       <Button variant="outline" size="sm">
                         <Upload className="w-4 h-4 mr-2" />
@@ -154,7 +155,7 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-gradient-to-r from-primary to-primary-dark">
+                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes
                 </Button>
@@ -176,8 +177,8 @@ const Settings = () => {
                       Profile Picture
                     </label>
                     <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                        <span className="text-white font-bold text-2xl">A</span>
+                      <div className="w-20 h-20 rounded-full border border-spiritual-200 bg-white flex items-center justify-center">
+                        <Logo size={56} showText={false} />
                       </div>
                       <Button variant="outline" size="sm">
                         <Upload className="w-4 h-4 mr-2" />
@@ -225,7 +226,7 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-gradient-to-r from-primary to-primary-dark">
+                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
                   <Save className="w-4 h-4 mr-2" />
                   Update Profile
                 </Button>
@@ -287,7 +288,7 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-gradient-to-r from-primary to-primary-dark">
+                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
                   <Save className="w-4 h-4 mr-2" />
                   Save Preferences
                 </Button>
@@ -340,7 +341,7 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-gradient-to-r from-primary to-primary-dark">
+                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
                   <Save className="w-4 h-4 mr-2" />
                   Update Password
                 </Button>
@@ -398,7 +399,7 @@ const Settings = () => {
               </div>
 
               <div className="flex justify-end pt-4 border-t">
-                <Button className="bg-gradient-to-r from-primary to-primary-dark">
+                <Button className="bg-spiritual-700 text-white hover:bg-spiritual-800">
                   <Save className="w-4 h-4 mr-2" />
                   Save Configuration
                 </Button>

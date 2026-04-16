@@ -141,7 +141,7 @@ const Dashboard: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-primary-500 to-secondary-600 p-4 sm:p-6 md:p-7 lg:p-8 text-white shadow-strong"
+          className="rounded-2xl sm:rounded-3xl bg-gradient-to-r from-primary-700 to-spiritual-700 p-4 sm:p-6 md:p-7 lg:p-8 text-white shadow-strong"
         >
           <div className="flex items-center justify-between">
             <div>

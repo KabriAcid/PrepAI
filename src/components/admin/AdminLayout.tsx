@@ -59,6 +59,8 @@ const notifications = [
   },
 ];
 
+const SCHOOL_ADDRESS = "No. 12 Layout, Katsina, Katsina";
+
 export const AdminLayout = ({ children }: AdminLayoutProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -92,7 +94,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             <Logo size="sm" showText={false} />
             <div>
               <h1 className="text-lg font-bold text-spiritual-900">PrepAI</h1>
-              <p className="text-xs text-spiritual-600">Admin Portal</p>
+              {/* <p className="text-xs text-spiritual-600">{SCHOOL_ADDRESS}</p> */}
             </div>
           </div>
 
@@ -135,7 +137,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 <Logo size="sm" showText={false} />
                 <div>
                   <h1 className="text-lg font-bold text-spiritual-900">PrepAI</h1>
-                  <p className="text-xs text-spiritual-600">Admin Portal</p>
+                  <p className="text-xs text-spiritual-600">{SCHOOL_ADDRESS}</p>
                 </div>
               </div>
               <button
@@ -183,7 +185,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                 <h2 className="text-base sm:text-lg font-bold text-spiritual-900">
                   PrepAI School
                 </h2>
-                <p className="text-xs text-spiritual-600 hidden sm:block">Admin Portal</p>
+                <p className="text-xs text-spiritual-600 hidden sm:block">{SCHOOL_ADDRESS}</p>
               </div>
             </div>
 
@@ -249,8 +251,8 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
                   onClick={() => setProfileOpen(!profileOpen)}
                   className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-spiritual-100 transition-colors"
                 >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary-500 to-secondary-500">
-                    <span className="text-white font-semibold text-sm">A</span>
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-spiritual-200 bg-white">
+                    <Logo size={22} showText={false} />
                   </div>
                   <ChevronDown className={`w-4 h-4 text-spiritual-700 hidden sm:block transition-transform ${profileOpen ? 'rotate-180' : ''
                     }`} />

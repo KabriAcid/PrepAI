@@ -28,11 +28,7 @@ const Logo: React.FC<LogoProps> = ({
     text = 'PrepAI',
 }) => {
     const px = resolveSize(size);
-    const src = showText
-        ? theme === 'light'
-            ? '/favicon-light.png'
-            : '/favicon-dark.png'
-        : '/logos/logo-mark.svg';
+    const src = theme === 'light' ? '/favicon-light.png' : '/favicon-dark.png';
 
     return (
         <span className={`inline-flex items-center ${className}`.trim()}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Bell, ChevronDown, Flame } from 'lucide-react'
 import clsx from 'clsx'
+import Logo from '@/components/Logo'
 
 interface HeaderProps {
   title?: string
@@ -64,8 +65,8 @@ const Header: React.FC<HeaderProps> = ({ title = 'Dashboard', streak = 7 }) => {
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center gap-2 rounded-lg hover:bg-spiritual-50 transition-colors p-2"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 text-sm font-bold text-white">
-                KB
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-spiritual-200 bg-white">
+                <Logo size={22} showText={false} />
               </div>
               <ChevronDown size={16} className="hidden sm:block text-spiritual-600" />
             </button>
