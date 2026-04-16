@@ -22,7 +22,7 @@ import ExamSubjectSelection from '@/pages/students/ExamSubjectSelection';
 import ExamSummary from '@/pages/students/ExamSummary';
 import Help from '@/pages/students/Help';
 import Performance from '@/pages/students/Performance';
-import Quiz from '@/pages/students/Quiz';
+import Quiz from './pages/students/Quiz';
 import Results from '@/pages/students/Results';
 import Settings from '@/pages/students/Settings';
 import Subjects from '@/pages/students/Subjects';

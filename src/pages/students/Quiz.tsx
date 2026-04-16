@@ -1,12 +1,19 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Clock, Flag, CheckCircle, Sparkles } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
-import { useQuiz } from '../context/QuizContext';
-import { Question, Quiz as QuizType } from '../types/quiz';
-import Button from '../components/ui/button';
-import ScoreBoard from '../components/ScoreBoard';
-import Modal from '../components/ui/Modal';
+import React, { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  ArrowRight,
+  CheckCircle,
+  Clock,
+  Flag,
+  Sparkles,
+  XCircle,
+} from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Layout from '@/components/layout/Layout';
+import Modal from '@/components/ui/Modal';
+import Button from '@/components/ui/button';
+import { useQuiz } from '@/context/QuizContext';
+import { Question, Quiz as QuizType } from '@/types/quiz';
 import {
   COMPULSORY_SUBJECT,
   QUESTION_DISTRIBUTION,
@@ -24,10 +31,12 @@ type QuestionTemplate = {
 const SUBJECT_TEMPLATES: Record<string, QuestionTemplate[]> = {
   [COMPULSORY_SUBJECT]: [
     {
-      question: 'Choose the option that best completes the sentence: The chairman, together with his aides, ___ arriving shortly.',
+      question:
+        'Choose the option that best completes the sentence: The chairman, together with his aides, ___ arriving shortly.',
       choices: ['are', 'were', 'is', 'have'],
       correctAnswer: 2,
-      explanation: 'The subject is "chairman" (singular), so the correct verb is "is".',
+      explanation:
+        'The subject is "chairman" (singular), so the correct verb is "is".',
     },
     {
       question: 'Identify the correctly punctuated sentence.',
@@ -38,7 +47,8 @@ const SUBJECT_TEMPLATES: Record<string, QuestionTemplate[]> = {
         'After the game we, went home.',
       ],
       correctAnswer: 1,
-      explanation: 'A comma follows an introductory phrase: "After the game, ..."',
+      explanation:
+        'A comma follows an introductory phrase: "After the game, ..."',
     },
   ],
   Mathematics: [
@@ -57,16 +67,19 @@ const SUBJECT_TEMPLATES: Record<string, QuestionTemplate[]> = {
   ],
   Biology: [
     {
-      question: 'Which organelle is responsible for energy production in cells?',
+      question:
+        'Which organelle is responsible for energy production in cells?',
       choices: ['Nucleus', 'Mitochondrion', 'Ribosome', 'Vacuole'],
       correctAnswer: 1,
-      explanation: 'Mitochondria are the site of ATP production during respiration.',
+      explanation:
+        'Mitochondria are the site of ATP production during respiration.',
     },
     {
       question: 'The process by which green plants make food is called:',
       choices: ['Respiration', 'Diffusion', 'Photosynthesis', 'Transpiration'],
       correctAnswer: 2,
-      explanation: 'Photosynthesis uses sunlight, carbon dioxide and water to form glucose.',
+      explanation:
+        'Photosynthesis uses sunlight, carbon dioxide and water to form glucose.',
     },
   ],
   Chemistry: [
@@ -104,7 +117,11 @@ const FALLBACK_SUBJECTS = ['Mathematics', 'Biology', 'Chemistry'];
 const getTemplatesForSubject = (subject: string): QuestionTemplate[] =>
   SUBJECT_TEMPLATES[subject] ?? SUBJECT_TEMPLATES[COMPULSORY_SUBJECT];
 
-const buildExamQuestions = (subject: string, count: number, prefix: string): Question[] => {
+const buildExamQuestions = (
+  subject: string,
+  count: number,
+  prefix: string,
+): Question[] => {
   const templates = getTemplatesForSubject(subject);
   return Array.from({ length: count }, (_, i) => {
     const template = templates[i % templates.length];
@@ -150,8 +167,16 @@ const buildQuizFromSetup = (selectedSubjects: string[]): QuizType => {
   };
 };
 
+const formatTime = (seconds: number): string => {
+  const mins = Math.floor(Math.max(seconds, 0) / 60);
+  const secs = Math.max(seconds, 0) % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
 const Quiz: React.FC = () => {
+  const navigate = useNavigate();
   const location = useLocation();
+
   const {
     currentQuiz,
     currentQuestionIndex,
@@ -162,20 +187,22 @@ const Quiz: React.FC = () => {
     answerQuestion,
     nextQuestion,
     previousQuestion,
+    setTimeRemaining,
     completeQuiz,
+    resetQuiz,
     getCurrentQuestion,
     getProgress,
-    getCorrectAnswersCount,
-    score,
   } = useQuiz();
 
   const [selectedAnswer, setSelectedAnswer] = useState<string | number>('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [timeWarning, setTimeWarning] = useState(false);
+  const [showQuitModal, setShowQuitModal] = useState(false);
   const [aiInsight, setAiInsight] = useState('');
   const [showAiInsight, setShowAiInsight] = useState(false);
 
-  const routeSetup = (location.state as { examSetup?: { selectedSubjects?: string[] } } | null)?.examSetup;
+  const routeSetup = (
+    location.state as { examSetup?: { selectedSubjects?: string[] } } | null
+  )?.examSetup;
 
   const selectedSubjects = useMemo(() => {
     const fromRoute = routeSetup?.selectedSubjects;
@@ -192,25 +219,30 @@ const Quiz: React.FC = () => {
     [selectedSubjects],
   );
 
-  // Initialize quiz on component mount
   useEffect(() => {
     if (!currentQuiz || currentQuiz.id !== mockQuiz.id) {
       startQuiz(mockQuiz);
     }
   }, [currentQuiz, mockQuiz, startQuiz]);
 
-  // Handle timer warnings
   useEffect(() => {
-    if (timeRemaining <= 60 && timeRemaining > 0 && !timeWarning) {
-      setTimeWarning(true);
+    if (!currentQuiz || isCompleted) return;
+    if (timeRemaining <= 0) {
+      completeQuiz();
+      return;
     }
-  }, [timeRemaining, timeWarning]);
 
-  // Load saved answer when question changes
+    const timer = window.setTimeout(() => {
+      setTimeRemaining(timeRemaining - 1);
+    }, 1000);
+
+    return () => window.clearTimeout(timer);
+  }, [currentQuiz, isCompleted, timeRemaining, setTimeRemaining, completeQuiz]);
+
   useEffect(() => {
-    const currentQuestion = getCurrentQuestion();
-    if (currentQuestion) {
-      const savedAnswer = answers[currentQuestion.id];
+    const question = getCurrentQuestion();
+    if (question) {
+      const savedAnswer = answers[question.id];
       setSelectedAnswer(savedAnswer || '');
       setShowAiInsight(false);
     }
@@ -218,67 +250,14 @@ const Quiz: React.FC = () => {
 
   const currentQuestion = getCurrentQuestion();
 
-  if (!currentQuiz || !currentQuestion) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-spiritual-600">Loading quiz...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isCompleted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-strong text-center"
-        >
-          <div className="w-20 h-20 bg-gradient-to-br from-success-500 to-success-600 rounded-full mx-auto mb-6 flex items-center justify-center animate-bounce-gentle">
-            <CheckCircle className="w-10 h-10 text-white" />
-          </div>
-          <h2 className="text-2xl font-bold text-spiritual-900 mb-2">Quiz Completed!</h2>
-          <p className="text-spiritual-600 mb-6">Congratulations! You have completed the quiz.</p>
-
-          <div className="space-y-4 mb-8">
-            <div className="flex justify-between items-center py-2 border-b border-spiritual-200">
-              <span className="text-spiritual-600">Final Score:</span>
-              <span className="font-bold text-primary-600">{score} points</span>
-            </div>
-            <div className="flex justify-between items-center py-2 border-b border-spiritual-200">
-              <span className="text-spiritual-600">Correct Answers:</span>
-              <span className="font-bold text-success-600">{getCorrectAnswersCount()}/{currentQuiz.questions.length}</span>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-spiritual-600">Accuracy:</span>
-              <span className="font-bold text-spiritual-900">
-                {Math.round((getCorrectAnswersCount() / currentQuiz.questions.length) * 100)}%
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <Button variant="primary" className="w-full">
-              View Results
-            </Button>
-            <Button variant="secondary" className="w-full">
-              Play Again
-            </Button>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
   const handleAnswerSelect = (answer: string | number) => {
+    if (!currentQuestion) return;
     setSelectedAnswer(answer);
     answerQuestion(currentQuestion.id, answer);
   };
 
   const handleNext = () => {
+    if (!currentQuiz) return;
     if (currentQuestionIndex < currentQuiz.questions.length - 1) {
       nextQuestion();
     } else {
@@ -289,6 +268,12 @@ const Quiz: React.FC = () => {
   const handleSubmit = () => {
     completeQuiz();
     setShowConfirmModal(false);
+  };
+
+  const handleQuit = () => {
+    resetQuiz();
+    setShowQuitModal(false);
+    navigate('/student/exams/summary');
   };
 
   const handleExplainWithAI = () => {
@@ -318,217 +303,304 @@ const Quiz: React.FC = () => {
     setShowAiInsight(true);
   };
 
-  const isLastQuestion = currentQuestionIndex === currentQuiz.questions.length - 1;
+  if (!currentQuiz || !currentQuestion) {
+    return (
+      <Layout title="Take Exam" streak={7}>
+        <div className="px-3 sm:px-6 lg:px-8">
+          <div className="min-h-[60vh] flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4" />
+              <p className="text-spiritual-600">Loading quiz...</p>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  const answeredCount = Object.keys(answers).length;
+  const totalQuestions = currentQuiz.questions.length;
+  const isLastQuestion = currentQuestionIndex === totalQuestions - 1;
   const canGoNext = selectedAnswer !== '';
+  const timerProgress = Math.max(
+    0,
+    Math.min(100, (timeRemaining / (currentQuiz.timeLimit || 1)) * 100),
+  );
+
+  if (isCompleted) {
+    return (
+      <Layout title="Take Exam" streak={7}>
+        <div className="px-3 sm:px-6 lg:px-8">
+          <div className="min-h-[60vh] flex items-center justify-center p-1 sm:p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="w-full max-w-lg bg-white/95 rounded-3xl p-6 sm:p-8 shadow-strong text-center"
+            >
+              <div className="w-20 h-20 bg-gradient-to-br from-success-500 to-success-600 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <CheckCircle className="w-10 h-10 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-spiritual-900 mb-2">Exam Submitted</h2>
+              <p className="text-spiritual-600 mb-6">Your responses have been recorded successfully.</p>
+
+              <div className="mb-6 rounded-xl border border-primary-200 bg-primary-50 px-4 py-3 text-primary-700 font-semibold">
+                Questions Answered: {answeredCount}/{totalQuestions}
+              </div>
+
+              <div className="space-y-3">
+                <Button variant="primary" className="w-full" onClick={() => navigate('/student/results')}>
+                  View Results
+                </Button>
+                <Button variant="secondary" className="w-full" onClick={() => navigate('/student/dashboard')}>
+                  Return to Dashboard
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 pt-20 pb-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Quiz Area */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <button
-                onClick={() => window.history.back()}
-                className="flex items-center space-x-2 text-spiritual-600 hover:text-primary-600 transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span>Back</span>
-              </button>
+    <Layout title="Take Exam" streak={7}>
+      <div className="px-3 sm:px-6 lg:px-8 pt-2 sm:pt-4 pb-2 sm:pb-8">
+        <div className="w-full">
+          <div className="mb-4 rounded-2xl border border-primary-200 bg-primary-50 p-4 sm:p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-spiritual-900">JAMB Mock CBT</h1>
+                <p className="text-sm sm:text-base text-spiritual-600">
+                  Answer all questions before submitting your exam.
+                </p>
+              </div>
 
-              <div className="flex items-center space-x-2 text-spiritual-600">
-                <Clock className="w-5 h-5" />
-                <span className={`font-mono ${timeRemaining < 60 ? 'text-error-600' : ''}`}>
-                  {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
-                </span>
+              <div className="text-left sm:text-right">
+                <p className="text-xs uppercase tracking-wider font-semibold text-primary-700">Time Remaining</p>
+                <motion.p
+                  key={timeRemaining}
+                  initial={{ opacity: 0.6, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className={`text-3xl sm:text-5xl font-extrabold leading-none ${timeRemaining <= 60 ? 'text-error-600 animate-pulse' : 'text-primary-600'}`}
+                >
+                  {formatTime(timeRemaining)}
+                </motion.p>
               </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-spiritual-600">
-                <span>Question {currentQuestionIndex + 1} of {currentQuiz.questions.length}</span>
-                <span>{Math.round(getProgress())}% Complete</span>
-              </div>
-              <div className="progress-bar">
-                <motion.div
-                  className="progress-fill"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${getProgress()}%` }}
-                  transition={{ duration: 0.5 }}
-                />
-              </div>
-            </div>
-
-            {/* Question Card */}
-            <AnimatePresence mode="wait">
+            <div className="mt-4 h-2 rounded-full bg-primary-100 overflow-hidden">
               <motion.div
-                key={currentQuestion.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="quiz-card"
-              >
-                <div className="space-y-6">
-                  <div>
-                    <h2 className="text-xl font-semibold text-spiritual-900 mb-2">
-                      {currentQuestion.question}
-                    </h2>
-                    {currentQuestion.arabicText && (
-                      <p className="text-lg font-arabic text-right text-spiritual-700 bg-spiritual-50 p-4 rounded-xl">
-                        {currentQuestion.arabicText}
-                      </p>
-                    )}
+                className="h-full bg-gradient-to-r from-primary-500 to-primary-600"
+                animate={{ width: `${timerProgress}%` }}
+                transition={{ duration: 0.8, ease: 'linear' }}
+              />
+            </div>
+          </div>
 
-                    <button
-                      type="button"
-                      onClick={handleExplainWithAI}
-                      className="mt-2 inline-flex items-center gap-2 rounded-lg border border-primary-200 bg-primary-50 px-3 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Explain with AI
-                    </button>
-                  </div>
+          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-4 sm:gap-6">
+            <div className="space-y-6">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentQuestion.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="quiz-card"
+                >
+                  <div className="space-y-6">
+                    <div>
+                      <h2 className="text-xl font-semibold text-spiritual-900 mb-2">
+                        {currentQuestion.question}
+                      </h2>
 
-                  {/* Answer Options */}
-                  <div className="space-y-3">
-                    {currentQuestion.type === 'mcq' && currentQuestion.choices && (
-                      <>
-                        {currentQuestion.choices.map((choice, index) => (
-                          <motion.button
-                            key={index}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            onClick={() => handleAnswerSelect(index)}
-                            className={`w-full p-4 text-left rounded-xl border-2 transition-all ${selectedAnswer === index
-                              ? 'border-primary-500 bg-primary-50 text-primary-700'
-                              : 'border-spiritual-200 bg-white hover:border-spiritual-300'
-                              }`}
-                          >
-                            <div className="flex items-center space-x-3">
-                              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedAnswer === index
-                                ? 'border-primary-500 bg-primary-500'
-                                : 'border-spiritual-300'
-                                }`}>
-                                {selectedAnswer === index && (
-                                  <div className="w-2 h-2 bg-white rounded-full" />
-                                )}
+                      {currentQuestion.arabicText && (
+                        <p className="text-lg font-arabic text-right text-spiritual-700 bg-spiritual-50 p-4 rounded-xl">
+                          {currentQuestion.arabicText}
+                        </p>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleExplainWithAI}
+                        className="mt-2 inline-flex items-center gap-2 rounded-lg border border-primary-200 bg-primary-50 px-3 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100"
+                      >
+                        <Sparkles className="h-4 w-4" />
+                        Explain with AI
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {currentQuestion.type === 'mcq' && currentQuestion.choices && (
+                        <>
+                          {currentQuestion.choices.map((choice, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleAnswerSelect(index)}
+                              className={`w-full p-4 text-left rounded-xl border-2 transition-colors ${selectedAnswer === index
+                                  ? 'border-primary-500 bg-primary-50 text-primary-700'
+                                  : 'border-spiritual-200 bg-white hover:border-spiritual-300'
+                                }`}
+                            >
+                              <div className="flex items-center space-x-3">
+                                <div
+                                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedAnswer === index
+                                      ? 'border-primary-500 bg-primary-500'
+                                      : 'border-spiritual-300'
+                                    }`}
+                                >
+                                  {selectedAnswer === index && (
+                                    <div className="w-2 h-2 bg-white rounded-full" />
+                                  )}
+                                </div>
+                                <span className="font-medium">{choice}</span>
                               </div>
-                              <span className="font-medium">{choice}</span>
-                            </div>
-                          </motion.button>
-                        ))}
-                      </>
-                    )}
+                            </button>
+                          ))}
+                        </>
+                      )}
 
-                    {currentQuestion.type === 'fill-blank' && (
-                      <div>
-                        <input
-                          type="text"
-                          value={selectedAnswer as string}
-                          onChange={(e) => handleAnswerSelect(e.target.value)}
-                          placeholder="Type your answer here..."
-                          className="input-field text-lg"
-                        />
+                      {currentQuestion.type === 'fill-blank' && (
+                        <div>
+                          <input
+                            type="text"
+                            value={selectedAnswer as string}
+                            onChange={(e) => handleAnswerSelect(e.target.value)}
+                            placeholder="Type your answer here..."
+                            className="input-field text-lg"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {showAiInsight && (
+                      <div className="rounded-xl border border-secondary-200 bg-secondary-50 p-4 text-sm leading-relaxed text-spiritual-700">
+                        {aiInsight}
                       </div>
                     )}
                   </div>
+                </motion.div>
+              </AnimatePresence>
 
-                  {showAiInsight && (
-                    <div className="rounded-xl border border-secondary-200 bg-secondary-50 p-4 text-sm leading-relaxed text-spiritual-700">
-                      {aiInsight}
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            </AnimatePresence>
+              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowQuitModal(true)}
+                  leftIcon={<XCircle className="w-4 h-4" />}
+                >
+                  Quit Exam
+                </Button>
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between">
-              <Button
-                variant="secondary"
-                onClick={previousQuestion}
-                disabled={currentQuestionIndex === 0}
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Previous
-              </Button>
-
-              <Button
-                variant="primary"
-                onClick={handleNext}
-                disabled={!canGoNext}
-              >
-                {isLastQuestion ? (
-                  <>
-                    <Flag className="w-4 h-4 mr-2" />
-                    Submit Quiz
-                  </>
-                ) : (
-                  <>
-                    Next
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <ScoreBoard
-              currentScore={score}
-              totalQuestions={currentQuiz.questions.length}
-              currentQuestion={currentQuestionIndex + 1}
-              timeRemaining={timeRemaining}
-              correctAnswers={getCorrectAnswersCount()}
-            />
-
-            {/* Question Navigator */}
-            <div className="quiz-card">
-              <h3 className="font-semibold text-spiritual-900 mb-4">Questions</h3>
-              <div className="grid grid-cols-5 gap-2">
-                {currentQuiz.questions.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${index === currentQuestionIndex
-                      ? 'bg-primary-500 text-white'
-                      : answers[currentQuiz.questions[index].id]
-                        ? 'bg-success-100 text-success-700 border border-success-300'
-                        : 'bg-spiritual-100 text-spiritual-600 hover:bg-spiritual-200'
-                      }`}
+                <div className="flex gap-3 sm:justify-end">
+                  <Button
+                    variant="secondary"
+                    onClick={previousQuestion}
+                    disabled={currentQuestionIndex === 0}
                   >
-                    {index + 1}
-                  </button>
-                ))}
+                    Previous
+                  </Button>
+
+                  <Button variant="primary" onClick={handleNext} disabled={!canGoNext}>
+                    {isLastQuestion ? (
+                      <>
+                        <Flag className="w-4 h-4 mr-2" />
+                        Submit Quiz
+                      </>
+                    ) : (
+                      <>
+                        Next
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="quiz-card">
+                <h3 className="font-semibold text-spiritual-900 mb-2">Questions Answered</h3>
+                <p className="text-3xl font-extrabold text-primary-600 leading-none">
+                  {answeredCount}/{totalQuestions}
+                </p>
+                <p className="mt-2 text-sm text-spiritual-600">
+                  {totalQuestions - answeredCount} remaining
+                </p>
+              </div>
+
+              <div className="quiz-card">
+                <h3 className="font-semibold text-spiritual-900 mb-4">Questions</h3>
+                <div className="grid grid-cols-5 gap-2">
+                  {currentQuiz.questions.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${index === currentQuestionIndex
+                          ? 'bg-primary-500 text-white'
+                          : answers[currentQuiz.questions[index].id]
+                            ? 'bg-success-100 text-success-700 border border-success-300'
+                            : 'bg-spiritual-100 text-spiritual-600 hover:bg-spiritual-200'
+                        }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Confirmation Modal */}
-      <Modal
-        isOpen={showConfirmModal}
-        onClose={() => setShowConfirmModal(false)}
-        title="Submit Quiz"
-      >
-        <div className="space-y-4">
-          <p className="text-spiritual-600">
-            Are you sure you want to submit your quiz? You won't be able to change your answers after submission.
-          </p>
-          <div className="flex space-x-3">
-            <Button variant="secondary" onClick={() => setShowConfirmModal(false)} className="flex-1">
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={handleSubmit} className="flex-1">
-              Submit
-            </Button>
+        <Modal
+          isOpen={showConfirmModal}
+          onClose={() => setShowConfirmModal(false)}
+          title="Submit Quiz"
+        >
+          <div className="space-y-4">
+            <p className="text-spiritual-600">
+              Are you sure you want to submit your quiz? You will not be able to
+              change your answers after submission.
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button
+                variant="secondary"
+                onClick={() => setShowConfirmModal(false)}
+                className="flex-1"
+              >
+                Continue Exam
+              </Button>
+              <Button variant="primary" onClick={handleSubmit} className="flex-1">
+                Submit Now
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal>
-    </div>
+        </Modal>
+
+        <Modal
+          isOpen={showQuitModal}
+          onClose={() => setShowQuitModal(false)}
+          title="Quit Exam"
+        >
+          <div className="space-y-4">
+            <p className="text-spiritual-600">
+              You are about to leave this exam session. Any unanswered questions will remain unanswered.
+              Do you want to quit?
+            </p>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button
+                variant="secondary"
+                onClick={() => setShowQuitModal(false)}
+                className="flex-1"
+              >
+                Stay in Exam
+              </Button>
+              <Button variant="danger" onClick={handleQuit} className="flex-1">
+                Yes, Quit
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    </Layout>
   );
 };
 

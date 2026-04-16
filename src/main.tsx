@@ -2,12 +2,15 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './app';
+import { QuizProvider } from './context/QuizContext';
 import './styles/app.css';
 
 createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
+        <QuizProvider>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </QuizProvider>
     </React.StrictMode>,
 );

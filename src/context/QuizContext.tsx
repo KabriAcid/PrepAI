@@ -6,6 +6,7 @@ type QuizAction =
   | { type: 'ANSWER_QUESTION'; payload: { questionId: string; answer: string | number } }
   | { type: 'NEXT_QUESTION' }
   | { type: 'PREVIOUS_QUESTION' }
+  | { type: 'GO_TO_QUESTION'; payload: number }
   | { type: 'SET_TIME_REMAINING'; payload: number }
   | { type: 'COMPLETE_QUIZ' }
   | { type: 'RESET_QUIZ' };
@@ -50,6 +51,17 @@ const quizReducer = (state: QuizState, action: QuizAction): QuizState => {
         ...state,
         currentQuestionIndex: Math.max(state.currentQuestionIndex - 1, 0),
       };
+    case 'GO_TO_QUESTION':
+      return {
+        ...state,
+        currentQuestionIndex: Math.max(
+          0,
+          Math.min(
+            action.payload,
+            (state.currentQuiz?.questions.length || 1) - 1,
+          ),
+        ),
+      };
     case 'SET_TIME_REMAINING':
       return {
         ...state,
@@ -71,7 +83,7 @@ const quizReducer = (state: QuizState, action: QuizAction): QuizState => {
 
 const calculateScore = (quiz: Quiz | null, answers: Record<string, string | number>): number => {
   if (!quiz) return 0;
-  
+
   let totalScore = 0;
   quiz.questions.forEach((question) => {
     const userAnswer = answers[question.id];
@@ -79,7 +91,7 @@ const calculateScore = (quiz: Quiz | null, answers: Record<string, string | numb
       totalScore += question.points;
     }
   });
-  
+
   return totalScore;
 };
 
@@ -88,6 +100,8 @@ interface QuizContextType extends QuizState {
   answerQuestion: (questionId: string, answer: string | number) => void;
   nextQuestion: () => void;
   previousQuestion: () => void;
+  goToQuestion: (index: number) => void;
+  setTimeRemaining: (time: number) => void;
   completeQuiz: () => void;
   resetQuiz: () => void;
   getCurrentQuestion: () => Question | null;
@@ -128,6 +142,14 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
     dispatch({ type: 'PREVIOUS_QUESTION' });
   };
 
+  const goToQuestion = (index: number) => {
+    dispatch({ type: 'GO_TO_QUESTION', payload: index });
+  };
+
+  const setTimeRemaining = (time: number) => {
+    dispatch({ type: 'SET_TIME_REMAINING', payload: time });
+  };
+
   const completeQuiz = () => {
     dispatch({ type: 'COMPLETE_QUIZ' });
   };
@@ -148,7 +170,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
 
   const getCorrectAnswersCount = (): number => {
     if (!state.currentQuiz) return 0;
-    
+
     let correctCount = 0;
     state.currentQuiz.questions.forEach((question) => {
       const userAnswer = state.answers[question.id];
@@ -156,7 +178,7 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
         correctCount++;
       }
     });
-    
+
     return correctCount;
   };
 
@@ -166,6 +188,8 @@ export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
     answerQuestion,
     nextQuestion,
     previousQuestion,
+    goToQuestion,
+    setTimeRemaining,
     completeQuiz,
     resetQuiz,
     getCurrentQuestion,
