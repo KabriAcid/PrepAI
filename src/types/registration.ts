@@ -13,6 +13,7 @@ export interface SchoolAdminFormData {
     adminEmail: string;
     schoolState: string;
     schoolLGA: string;
+    schoolName: string;
     schoolAddress: string;
     numberOfStudents: number;
     password: string;

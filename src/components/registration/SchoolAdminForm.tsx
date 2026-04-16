@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import {
     AlertCircle,
+    Building2,
     Info,
     Lock,
     LockKeyhole,
@@ -64,7 +65,7 @@ export default function SchoolAdminForm({
                         {/* Admin Name */}
                         <div>
                             <div className="relative">
-                                <User className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                                <User className="input-icon" />
                                 <input
                                     type="text"
                                     value={formData.adminName}
@@ -86,7 +87,7 @@ export default function SchoolAdminForm({
                         {/* Admin Phone */}
                         <div>
                             <div className="relative">
-                                <Phone className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                                <Phone className="input-icon" />
                                 <input
                                     type="tel"
                                     value={formData.adminPhone}
@@ -108,7 +109,7 @@ export default function SchoolAdminForm({
                         {/* Admin Email - spans full width */}
                         <div className="sm:col-span-2">
                             <div className="relative">
-                                <Mail className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                                <Mail className="input-icon" />
                                 <input
                                     type="email"
                                     value={formData.adminEmail}
@@ -142,7 +143,7 @@ export default function SchoolAdminForm({
                         {/* State */}
                         <div>
                             <div className="relative">
-                                <MapPin className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                                <MapPin className="input-icon" />
                                 <select
                                     value={formData.schoolState}
                                     onChange={(e) =>
@@ -169,7 +170,7 @@ export default function SchoolAdminForm({
                         {/* LGA */}
                         <div>
                             <div className="relative">
-                                <Map className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                                <Map className="input-icon" />
                                 <select
                                     value={formData.schoolLGA}
                                     onChange={(e) =>
@@ -198,10 +199,32 @@ export default function SchoolAdminForm({
                         </div>
                     </div>
 
+                    {/* School Name - Full Width */}
+                    <div>
+                        <div className="relative">
+                            <Building2 className="input-icon" />
+                            <input
+                                type="text"
+                                value={formData.schoolName}
+                                onChange={(e) =>
+                                    onChange('schoolName', e.target.value)
+                                }
+                                placeholder="School Name"
+                                className="input-field-icon"
+                                required
+                            />
+                        </div>
+                        {errors.schoolName && (
+                            <span className="mt-1 block text-sm text-error-600">
+                                {errors.schoolName}
+                            </span>
+                        )}
+                    </div>
+
                     {/* Address - Full Width */}
                     <div>
                         <div className="relative">
-                            <MapPinned className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                            <MapPinned className="input-icon" />
                             <textarea
                                 value={formData.schoolAddress}
                                 onChange={(e) =>
@@ -223,7 +246,7 @@ export default function SchoolAdminForm({
                     {/* Number of Students */}
                     <div>
                         <div className="relative">
-                            <Users className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                            <Users className="input-icon" />
                             <input
                                 type="number"
                                 value={formData.numberOfStudents || ''}
@@ -271,7 +294,7 @@ export default function SchoolAdminForm({
                         {/* Password */}
                         <div>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                                <Lock className="input-icon" />
                                 <input
                                     type="password"
                                     value={formData.password}
@@ -296,7 +319,7 @@ export default function SchoolAdminForm({
                         {/* Confirm Password */}
                         <div>
                             <div className="relative">
-                                <LockKeyhole className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                                <LockKeyhole className="input-icon" />
                                 <input
                                     type="password"
                                     value={formData.password_confirmation}
@@ -358,6 +381,14 @@ export default function SchoolAdminForm({
                                 </span>
                             </div>
                             <div className="border-t border-primary-300 pt-2 sm:pt-3">
+                                <div className="mb-2 flex justify-between">
+                                    <span className="font-medium">
+                                        School Name:
+                                    </span>
+                                    <span className="text-right">
+                                        {formData.schoolName}
+                                    </span>
+                                </div>
                                 <div className="flex justify-between">
                                     <span className="font-medium">
                                         Location:

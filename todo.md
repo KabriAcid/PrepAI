@@ -1,3 +1,4 @@
 - Change the app secondary color to the yellowish sample color used in the 'best subject' banner/card in the student dashboard.
 - Page title should be directly in the main content not in the topbar.
-- Change the app
+- Design a forgot password modal for resetting password and professional email HTML body with instructions for resetting and a route (and page) for resetting password.
+- Provide a tab switch for login as school admin or student

@@ -32,7 +32,7 @@ export default function StudentForm({
                 >
                     <div>
                         <div className="relative">
-                            <User className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                            <User className="input-icon" />
                             <input
                                 type="text"
                                 value={formData.name}
@@ -53,7 +53,7 @@ export default function StudentForm({
 
                     <div>
                         <div className="relative">
-                            <Mail className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                            <Mail className="input-icon" />
                             <input
                                 type="email"
                                 value={formData.email}
@@ -82,7 +82,7 @@ export default function StudentForm({
                 >
                     <div>
                         <div className="relative">
-                            <Lock className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                            <Lock className="input-icon" />
                             <input
                                 type="password"
                                 value={formData.password}
@@ -106,7 +106,7 @@ export default function StudentForm({
 
                     <div>
                         <div className="relative">
-                            <LockKeyhole className="absolute left-3 top-3.5 h-5 w-5 text-spiritual-400" />
+                            <LockKeyhole className="input-icon" />
                             <input
                                 type="password"
                                 value={formData.password_confirmation}

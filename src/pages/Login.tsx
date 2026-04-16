@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Chrome, Facebook } from 'lucide-react';
+import { ArrowLeft, Home } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/button';
@@ -102,17 +102,6 @@ const Login: React.FC = () => {
     return (
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 via-white to-secondary-50 p-4">
             <div className="w-full max-w-md">
-                {/* Back Button */}
-                <motion.button
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    onClick={() => window.history.back()}
-                    className="mb-8 flex items-center space-x-2 text-spiritual-600 transition-colors hover:text-primary-600"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                    <span>Back</span>
-                </motion.button>
-
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -226,38 +215,6 @@ const Login: React.FC = () => {
                                 {isLoading ? 'Signing In...' : 'Sign In'}
                             </span>
                         </button>
-
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-spiritual-200" />
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                                <span className="bg-white px-2 text-spiritual-500">
-                                    Or with
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={handleFacebookLogin}
-                                className="flex items-center justify-center space-x-2"
-                            >
-                                <Facebook className="h-4 w-4 text-blue-600" />
-                                <span>Facebook</span>
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={handleGoogleLogin}
-                                className="flex items-center justify-center space-x-2"
-                            >
-                                <Chrome className="h-4 w-4 text-red-500" />
-                                <span>Google</span>
-                            </Button>
-                        </div>
 
                         <div className="text-center">
                             <span className="text-spiritual-600">

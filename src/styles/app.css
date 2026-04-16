@@ -142,6 +142,10 @@ select {
     @apply w-full resize-none rounded-xl border border-spiritual-300 bg-white/80 py-3 pl-10 pr-4 text-sm placeholder-spiritual-400 outline-none backdrop-blur-sm transition-all duration-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 sm:text-base;
 }
 
+.input-icon {
+    @apply pointer-events-none absolute left-3 top-3.5 z-10 h-5 w-5 text-spiritual-400;
+}
+
 /* Card Styles */
 .quiz-card {
     @apply card-hover rounded-2xl border border-white/20 bg-white/90 p-6 shadow-soft backdrop-blur-sm;

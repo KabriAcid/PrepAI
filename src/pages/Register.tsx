@@ -80,6 +80,7 @@ export default function Register() {
             adminEmail: '',
             schoolState: '',
             schoolLGA: '',
+            schoolName: '',
             schoolAddress: '',
             numberOfStudents: 100,
             password: '',
@@ -183,6 +184,9 @@ export default function Register() {
                     newErrors.schoolLGA =
                         'Please select a Local Government Area';
                 }
+                if (!schoolAdminFormData.schoolName.trim()) {
+                    newErrors.schoolName = 'School name is required';
+                }
                 if (!schoolAdminFormData.schoolAddress.trim()) {
                     newErrors.schoolAddress = 'School address is required';
                 }
@@ -259,6 +263,7 @@ export default function Register() {
                         admin_email: schoolAdminFormData.adminEmail,
                         school_state: schoolAdminFormData.schoolState,
                         school_lga: schoolAdminFormData.schoolLGA,
+                        school_name: schoolAdminFormData.schoolName,
                         school_address: schoolAdminFormData.schoolAddress,
                         number_of_students:
                             schoolAdminFormData.numberOfStudents,
@@ -289,6 +294,7 @@ export default function Register() {
             }
 
             if (accountType === 'student') {
+                setIsLoading(false);
                 navigate('/login');
             } else {
                 // For school admin, show success modal first
@@ -296,9 +302,11 @@ export default function Register() {
                 setRegistrationData({
                     admin_email: schoolAdminFormData.adminEmail,
                     formatted_amount: `₦${totalAmount.toLocaleString()}.00`,
+                    school_name: schoolAdminFormData.schoolName,
                     school_code: `SCH${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
                     number_of_students: schoolAdminFormData.numberOfStudents,
                 });
+                setIsLoading(false);
                 setShowSuccessModal(true);
             }
         } catch (error: any) {
@@ -319,7 +327,7 @@ export default function Register() {
 
     const handleSuccessModalClose = () => {
         setShowSuccessModal(false);
-        navigate('/');
+        navigate('/login');
     };
 
     return (
@@ -479,8 +487,8 @@ export default function Register() {
                                                     : {}
                                             }
                                             className={`inline-flex items-center rounded-xl px-6 py-3 text-sm font-bold shadow-medium transition-all duration-300 sm:px-8 sm:py-3.5 sm:text-base ${agreeToTerms && !isLoading
-                                                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:shadow-strong'
-                                                    : 'cursor-not-allowed bg-spiritual-300 text-spiritual-500'
+                                                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:shadow-strong'
+                                                : 'cursor-not-allowed bg-spiritual-300 text-spiritual-500'
                                                 }`}
                                         >
                                             {isLoading ? (

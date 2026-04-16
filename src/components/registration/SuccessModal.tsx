@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Home } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import type { RegistrationData } from '../../types/registration';
 
 interface SuccessModalProps {
@@ -65,10 +65,10 @@ export default function SuccessModal({
                                 </motion.div>
                             </div>
                             <h2 className="mb-2 text-2xl font-bold text-spiritual-900 sm:text-3xl">
-                                Registration Successful! 🎉
+                                Registration Submitted! 🎉
                             </h2>
                             <p className="text-sm text-spiritual-600 sm:text-base">
-                                Your school account has been created
+                                Check your email for payment and activation instructions
                             </p>
                         </div>
 
@@ -87,7 +87,7 @@ export default function SuccessModal({
                                         <strong>
                                             ({registrationData.admin_email})
                                         </strong>{' '}
-                                        for payment instructions
+                                        for bank transfer details or your Remita/Flutterwave payment link
                                     </p>
                                 </div>
                                 <div className="flex items-start">
@@ -99,7 +99,7 @@ export default function SuccessModal({
                                         <strong className="text-warning-700">
                                             {registrationData.formatted_amount}
                                         </strong>{' '}
-                                        to the provided account
+                                        using the instructions provided in that email
                                     </p>
                                 </div>
                                 <div className="flex items-start">
@@ -107,9 +107,7 @@ export default function SuccessModal({
                                         3
                                     </span>
                                     <p>
-                                        Your account will be activated within{' '}
-                                        <strong>24 hours</strong> of payment
-                                        confirmation
+                                        Send your proof of payment following the email instructions for quick verification
                                     </p>
                                 </div>
                                 <div className="flex items-start">
@@ -117,8 +115,7 @@ export default function SuccessModal({
                                         4
                                     </span>
                                     <p>
-                                        You'll receive an activation email with
-                                        your dashboard access link
+                                        After verification, you'll receive a confirmation email and can sign in to your dashboard
                                     </p>
                                 </div>
                             </div>
@@ -163,8 +160,8 @@ export default function SuccessModal({
                             onClick={onClose}
                             className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 text-sm font-bold text-white shadow-medium transition-all duration-300 hover:scale-105 hover:shadow-strong active:scale-95 sm:py-4 sm:text-base"
                         >
-                            <Home className="mr-2 h-5 w-5" />
-                            Back to Home
+                            <LogIn className="mr-2 h-5 w-5" />
+                            Continue to Sign In
                         </button>
 
                         <p className="mt-4 text-center text-xs text-spiritual-500 sm:text-sm">

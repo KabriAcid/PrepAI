@@ -1,5 +1,11 @@
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import {
+    BookOpenCheck,
+    Building2,
+    ClipboardCheck,
+    Lock,
+    UserRound,
+} from 'lucide-react';
 import type { AccountType } from '../../types/registration';
 
 interface ProgressIndicatorProps {
@@ -8,13 +14,45 @@ interface ProgressIndicatorProps {
     accountType: AccountType;
 }
 
-const studentStepLabels = ['Account', 'Security', 'Confirm'];
-const adminStepLabels = [
-    'Admin Info',
-    'School Details',
-    'Address & Capacity',
-    'Security',
-    'Confirm',
+const studentSteps = [
+    {
+        title: 'Personal Info',
+        subtitle: 'Please provide your personal details',
+        icon: UserRound,
+    },
+    {
+        title: 'Account Security',
+        subtitle: 'Create a secure password to protect your account',
+        icon: Lock,
+    },
+    {
+        title: 'Review & Confirm',
+        subtitle: 'Confirm your details before submission',
+        icon: ClipboardCheck,
+    },
+];
+
+const adminSteps = [
+    {
+        title: 'Admin Info',
+        subtitle: 'Tell us about the school administrator',
+        icon: UserRound,
+    },
+    {
+        title: 'School Details',
+        subtitle: 'Enter school profile, location and capacity',
+        icon: Building2,
+    },
+    {
+        title: 'Account Security',
+        subtitle: 'Set credentials for secure dashboard access',
+        icon: Lock,
+    },
+    {
+        title: 'Review & Confirm',
+        subtitle: 'Check all details and submit your registration',
+        icon: BookOpenCheck,
+    },
 ];
 
 export default function ProgressIndicator({
@@ -22,68 +60,37 @@ export default function ProgressIndicator({
     totalSteps,
     accountType,
 }: ProgressIndicatorProps) {
-    const stepLabels =
-        accountType === 'student' ? studentStepLabels : adminStepLabels;
+    const steps = accountType === 'student' ? studentSteps : adminSteps;
+    const activeStep = steps[currentStep - 1];
+    const ActiveIcon = activeStep.icon;
 
     return (
         <div className="mb-6 sm:mb-8">
-            {/* Desktop: Full Step Indicators */}
-            <div className="hidden items-center justify-between lg:flex">
-                {Array.from({ length: totalSteps }, (_, i) => i + 1).map(
-                    (step) => (
-                        <div
-                            key={step}
-                            className={`flex items-center ${step < totalSteps ? 'flex-1' : ''}`}
-                        >
-                            <div className="flex flex-col items-center">
-                                <motion.div
-                                    initial={false}
-                                    animate={{
-                                        scale: currentStep === step ? 1.1 : 1,
-                                    }}
-                                    className={`flex h-10 w-10 items-center justify-center rounded-full font-bold transition-all duration-300 ${currentStep > step ? 'bg-success-600 text-white' : currentStep === step ? 'bg-primary-600 text-white' : 'bg-spiritual-200 text-spiritual-600'}`}
-                                >
-                                    {currentStep > step ? (
-                                        <Check className="h-5 w-5" />
-                                    ) : (
-                                        step
-                                    )}
-                                </motion.div>
-                                <span className="mt-2 text-xs font-medium text-spiritual-600">
-                                    {stepLabels[step - 1]}
-                                </span>
-                            </div>
-                            {step < totalSteps && (
-                                <div
-                                    className={`mx-4 h-1 flex-1 rounded border-t-2 border-dotted transition-all duration-300 ${currentStep > step ? 'border-success-600' : 'border-spiritual-200'}`}
-                                />
-                            )}
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-2xl border border-primary-100 bg-primary-50/70 p-4 sm:p-5 lg:p-6"
+            >
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-start gap-3">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary-600 text-white shadow-soft sm:h-12 sm:w-12 sm:rounded-2xl">
+                            <ActiveIcon className="h-5 w-5 sm:h-6 sm:w-6" />
                         </div>
-                    ),
-                )}
-            </div>
+                        <div className="min-w-0">
+                            <h3 className="truncate text-lg font-bold text-spiritual-900 sm:text-2xl lg:text-3xl">
+                                {activeStep.title}
+                            </h3>
+                            <p className="mt-1 text-xs text-primary-700 sm:text-sm lg:text-base">
+                                {activeStep.subtitle}
+                            </p>
+                        </div>
+                    </div>
 
-            {/* Mobile: Single Step Display */}
-            <div className="lg:hidden">
-                <div className="mb-3 flex flex-col items-center gap-2">
-                    <span className="text-lg font-bold text-primary-600">
-                        Step {currentStep} of {totalSteps}
-                    </span>
-                    <span className="text-sm font-medium text-spiritual-600">
-                        {stepLabels[currentStep - 1]}
+                    <span className="rounded-full bg-primary-100 px-2.5 py-1 text-xs font-semibold text-primary-700 sm:px-3 sm:text-sm">
+                        {currentStep}/{totalSteps}
                     </span>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-spiritual-200">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{
-                            width: `${(currentStep / totalSteps) * 100}%`,
-                        }}
-                        transition={{ duration: 0.5 }}
-                        className="h-full rounded-full bg-gradient-to-r from-primary-500 to-secondary-500"
-                    />
-                </div>
-            </div>
+            </motion.div>
         </div>
     );
 }

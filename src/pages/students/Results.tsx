@@ -234,10 +234,10 @@ const Results: React.FC = () => {
             className="lg:flex-1"
           />
           <div className="flex gap-2">
-            <Button variant="secondary" leftIcon={<Filter size={18} />} size="md">
+            <Button variant="primary" leftIcon={<Filter size={18} />} size="md">
               Filters
             </Button>
-            <Button variant="secondary" leftIcon={<Download size={18} />} size="md">
+            <Button variant="primary" leftIcon={<Download size={18} />} size="md">
               Export
             </Button>
           </div>
