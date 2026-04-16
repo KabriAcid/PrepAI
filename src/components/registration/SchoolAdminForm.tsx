@@ -411,9 +411,9 @@ export default function SchoolAdminForm({
                                     {formData.numberOfStudents.toLocaleString()}
                                 </span>
                             </div>
-                            <div className="mt-2 flex items-center justify-between rounded-lg border border-warning-200 bg-warning-50 p-2 sm:mt-3 sm:p-3">
+                            <div className="mt-2 flex items-center justify-between rounded-lg border border-primary-200 bg-primary-100/70 p-2 sm:mt-3 sm:p-3">
                                 <span className="font-bold">Total Amount:</span>
-                                <span className="text-lg font-bold text-warning-700 sm:text-xl">
+                                <span className="text-lg font-bold text-primary-700 sm:text-xl">
                                     ₦{totalAmount.toLocaleString()}.00
                                 </span>
                             </div>

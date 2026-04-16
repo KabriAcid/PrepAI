@@ -297,14 +297,23 @@ export default function Register() {
                 setIsLoading(false);
                 navigate('/login');
             } else {
-                // For school admin, show success modal first
+                // For school admin, show success modal with server-provided details.
                 const totalAmount = schoolAdminFormData.numberOfStudents * 1000;
+                const serverData = responseBody?.data ?? {};
                 setRegistrationData({
-                    admin_email: schoolAdminFormData.adminEmail,
-                    formatted_amount: `₦${totalAmount.toLocaleString()}.00`,
-                    school_name: schoolAdminFormData.schoolName,
-                    school_code: `SCH${Math.random().toString(36).substr(2, 6).toUpperCase()}`,
-                    number_of_students: schoolAdminFormData.numberOfStudents,
+                    admin_email:
+                        serverData.admin_email ?? schoolAdminFormData.adminEmail,
+                    formatted_amount:
+                        serverData.formatted_amount ??
+                        `₦${totalAmount.toLocaleString()}.00`,
+                    school_name:
+                        serverData.school_name ?? schoolAdminFormData.schoolName,
+                    school_code:
+                        serverData.school_code ??
+                        `SCH${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+                    number_of_students:
+                        serverData.number_of_students ??
+                        schoolAdminFormData.numberOfStudents,
                 });
                 setIsLoading(false);
                 setShowSuccessModal(true);
@@ -445,14 +454,14 @@ export default function Register() {
                                 )}
 
                                 {/* Navigation Buttons */}
-                                <div className="flex items-center justify-between border-t border-spiritual-200 pt-4 sm:pt-6">
+                                <div className="flex flex-col-reverse gap-3 border-t border-spiritual-200 pt-4 sm:flex-row sm:items-center sm:justify-between sm:pt-6">
                                     {currentStep > 1 ? (
                                         <motion.button
                                             type="button"
                                             onClick={handlePreviousStep}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="btn-back"
+                                            className="btn-back w-full justify-center sm:w-auto"
                                         >
                                             <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                                             Back
@@ -463,7 +472,7 @@ export default function Register() {
                                             onClick={handleBackToAccountType}
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="btn-back"
+                                            className="btn-back w-full justify-center sm:w-auto"
                                         >
                                             <ArrowLeft className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                                             Change Account Type
@@ -486,7 +495,7 @@ export default function Register() {
                                                     ? { scale: 0.95 }
                                                     : {}
                                             }
-                                            className={`inline-flex items-center rounded-xl px-6 py-3 text-sm font-bold shadow-medium transition-all duration-300 sm:px-8 sm:py-3.5 sm:text-base ${agreeToTerms && !isLoading
+                                            className={`inline-flex w-full items-center justify-center rounded-xl px-6 py-3 text-sm font-bold shadow-medium transition-all duration-300 sm:w-auto sm:px-8 sm:py-3.5 sm:text-base ${agreeToTerms && !isLoading
                                                 ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:shadow-strong'
                                                 : 'cursor-not-allowed bg-spiritual-300 text-spiritual-500'
                                                 }`}
@@ -541,7 +550,7 @@ export default function Register() {
                                                     ? { scale: 0.95 }
                                                     : {}
                                             }
-                                            className="btn-continue"
+                                            className="btn-continue w-full justify-center sm:w-auto"
                                         >
                                             Continue
                                             <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />

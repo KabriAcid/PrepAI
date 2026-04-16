@@ -19,7 +19,6 @@ import AdminSubjects from '@/pages/school-admin/Subjects';
 import AdminSupport from '@/pages/school-admin/Support';
 import Dashboard from '@/pages/students/Dashboard';
 import Help from '@/pages/students/Help';
-import MyExams from '@/pages/students/MyExams';
 import Performance from '@/pages/students/Performance';
 import PracticeTests from '@/pages/students/PracticeTests';
 import Results from '@/pages/students/Results';
@@ -49,8 +48,7 @@ const App: React.FC = () => {
                 />
 
                 <Route path="/student/dashboard" element={<Dashboard />} />
-                <Route path="/student/exams" element={<MyExams />} />
-                <Route path="/student/practice-tests" element={<PracticeTests />} />
+                <Route path="/student/exams" element={<PracticeTests />} />
                 <Route path="/student/quiz" element={<Quiz />} />
                 <Route path="/student/results" element={<Results />} />
                 <Route path="/student/performance" element={<Performance />} />
