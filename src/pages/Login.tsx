@@ -1,20 +1,47 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Home } from 'lucide-react';
+import { School, UserRound } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Modal from '../components/ui/Modal';
 import Button from '../components/ui/button';
 import Input from '../components/ui/input';
 
+type AccountType = 'student' | 'school_admin';
+
+const DUMMY_CREDENTIALS: Record<
+    AccountType,
+    { email: string; password: string; redirectPath: string }
+> = {
+    student: {
+        email: 'student@prepai.com',
+        password: 'student123',
+        redirectPath: '/student/dashboard',
+    },
+    school_admin: {
+        email: 'admin@prepai.com',
+        password: 'admin123',
+        redirectPath: '/admin',
+    },
+};
+
 const Login: React.FC = () => {
     const navigate = useNavigate();
+    const [accountType, setAccountType] = useState<AccountType>('student');
 
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         rememberMe: false,
     });
+    const [forgotPasswordData, setForgotPasswordData] = useState({
+        email: '',
+    });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
+    const [showForgotPasswordModal, setShowForgotPasswordModal] =
+        useState(false);
+    const [isForgotLoading, setIsForgotLoading] = useState(false);
+    const [forgotStatusMessage, setForgotStatusMessage] = useState('');
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -46,6 +73,33 @@ const Login: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+    const validateForgotPassword = () => {
+        const newErrors: Record<string, string> = {};
+
+        if (!forgotPasswordData.email) {
+            newErrors.forgotEmail = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(forgotPasswordData.email)) {
+            newErrors.forgotEmail = 'Please enter a valid email';
+        }
+
+        setErrors((prev) => ({ ...prev, ...newErrors }));
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const attemptDummyLogin = (): string | null => {
+        const selectedCredentials = DUMMY_CREDENTIALS[accountType];
+        const inputEmail = formData.email.trim().toLowerCase();
+
+        if (
+            inputEmail === selectedCredentials.email &&
+            formData.password === selectedCredentials.password
+        ) {
+            return selectedCredentials.redirectPath;
+        }
+
+        return null;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -61,6 +115,7 @@ const Login: React.FC = () => {
                     Accept: 'application/json',
                 },
                 body: JSON.stringify({
+                    account_type: accountType,
                     email: formData.email,
                     password: formData.password,
                     remember: formData.rememberMe,
@@ -70,6 +125,12 @@ const Login: React.FC = () => {
             const payload = await response.json().catch(() => ({}));
 
             if (!response.ok) {
+                const fallbackRedirect = attemptDummyLogin();
+                if (fallbackRedirect) {
+                    navigate(fallbackRedirect);
+                    return;
+                }
+
                 setErrors({
                     email: payload?.errors?.email?.[0] ?? '',
                     password: payload?.errors?.password?.[0] ?? '',
@@ -79,24 +140,79 @@ const Login: React.FC = () => {
                 return;
             }
 
-            navigate('/student/dashboard');
+            const redirectPath =
+                payload?.data?.redirect_path ??
+                (accountType === 'school_admin'
+                    ? '/admin'
+                    : '/student/dashboard');
+
+            navigate(redirectPath);
         } catch {
+            const fallbackRedirect = attemptDummyLogin();
+            if (fallbackRedirect) {
+                navigate(fallbackRedirect);
+                return;
+            }
+
             setErrors({
-                general: 'Network error. Please check your connection and retry.',
+                general:
+                    'Unable to sign in with those credentials. Check your account type and try again.',
             });
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleGoogleLogin = () => {
-        // TODO: Implement Google OAuth
-        console.log('Google login coming soon');
+    const handleOpenForgotPassword = () => {
+        setForgotStatusMessage('');
+        setErrors((prev) => ({ ...prev, forgotEmail: '' }));
+        setForgotPasswordData({ email: formData.email });
+        setShowForgotPasswordModal(true);
     };
 
-    const handleFacebookLogin = () => {
-        // TODO: Implement Facebook OAuth
-        console.log('Facebook login coming soon');
+    const handleForgotPasswordSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!validateForgotPassword()) return;
+
+        setIsForgotLoading(true);
+
+        try {
+            const response = await fetch('/api/forgot-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    account_type: accountType,
+                    email: forgotPasswordData.email,
+                }),
+            });
+
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                setErrors((prev) => ({
+                    ...prev,
+                    forgotEmail:
+                        payload?.message ??
+                        'Unable to send reset instructions right now.',
+                }));
+                return;
+            }
+
+            setForgotStatusMessage(
+                payload?.message ??
+                'If this email exists, reset instructions have been sent.',
+            );
+        } catch {
+            setErrors((prev) => ({
+                ...prev,
+                forgotEmail:
+                    'Unable to send reset instructions right now. Please try again.',
+            }));
+        } finally {
+            setIsForgotLoading(false);
+        }
     };
 
     return (
@@ -113,7 +229,42 @@ const Login: React.FC = () => {
                             Sign In
                         </h1>
                         <p className="text-spiritual-600">
-                            Welcome back you've been missed
+                            Welcome back, select your portal to continue
+                        </p>
+                    </div>
+
+                    <div className="mb-6 grid grid-cols-2 gap-2 rounded-xl bg-spiritual-100 p-1">
+                        <button
+                            type="button"
+                            onClick={() => setAccountType('student')}
+                            className={`inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${accountType === 'student'
+                                ? 'bg-white text-primary-700 shadow-soft'
+                                : 'text-spiritual-600 hover:text-spiritual-800'
+                                }`}
+                        >
+                            <UserRound className="h-4 w-4" />
+                            Student
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setAccountType('school_admin')}
+                            className={`inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${accountType === 'school_admin'
+                                ? 'bg-white text-primary-700 shadow-soft'
+                                : 'text-spiritual-600 hover:text-spiritual-800'
+                                }`}
+                        >
+                            <School className="h-4 w-4" />
+                            School Admin
+                        </button>
+                    </div>
+
+                    <div className="mb-5 rounded-xl border border-secondary-200 bg-secondary-50 px-4 py-3 text-xs text-spiritual-700 sm:text-sm">
+                        <p className="font-semibold text-spiritual-800">Dummy Login Credentials</p>
+                        <p>
+                            Student: student@prepai.com / student123
+                        </p>
+                        <p>
+                            School Admin: admin@prepai.com / admin123
                         </p>
                     </div>
 
@@ -177,7 +328,11 @@ const Login: React.FC = () => {
                                 </span>
                             </label>
                             <Link
-                                to="/forgot-password"
+                                to="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleOpenForgotPassword();
+                                }}
                                 className="text-sm text-primary-600 hover:text-primary-700"
                             >
                                 Forgot Password?
@@ -230,6 +385,67 @@ const Login: React.FC = () => {
                     </form>
                 </motion.div>
             </div>
+
+            <Modal
+                isOpen={showForgotPasswordModal}
+                onClose={() => setShowForgotPasswordModal(false)}
+                title="Reset Password"
+                size="md"
+            >
+                <form onSubmit={handleForgotPasswordSubmit} className="space-y-4">
+                    <p className="text-sm text-spiritual-600">
+                        Enter your login email and we will send password reset
+                        instructions.
+                    </p>
+
+                    <Input
+                        type="email"
+                        value={forgotPasswordData.email}
+                        onChange={(e) => {
+                            setForgotPasswordData({ email: e.target.value });
+                            if (errors.forgotEmail) {
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    forgotEmail: '',
+                                }));
+                            }
+                        }}
+                        placeholder="you@example.com"
+                    />
+                    {errors.forgotEmail && (
+                        <p className="text-sm text-error-600">
+                            {errors.forgotEmail}
+                        </p>
+                    )}
+
+                    {forgotStatusMessage && (
+                        <div className="rounded-xl border border-success-200 bg-success-50 p-3 text-sm text-success-700">
+                            {forgotStatusMessage}
+                        </div>
+                    )}
+
+                    <div className="flex gap-3">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            className="flex-1"
+                            onClick={() => setShowForgotPasswordModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            className="flex-1"
+                            disabled={isForgotLoading}
+                        >
+                            {isForgotLoading
+                                ? 'Sending...'
+                                : 'Send Reset Link'}
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 };

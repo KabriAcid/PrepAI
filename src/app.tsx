@@ -5,6 +5,7 @@ import Home from '@/pages/Home';
 import Leaderboard from '@/pages/Leaderboard';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
+import ResetPassword from '@/pages/ResetPassword';
 import AdminDashboard from '@/pages/school-admin/Dashboard';
 import AdminExams from '@/pages/school-admin/Exams';
 import AdminNotifications from '@/pages/school-admin/Notifications';
@@ -35,6 +36,7 @@ const App: React.FC = () => {
                 <Route path="/home" element={<Home />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/register" element={<Register />} />
                 <Route
                     path="/dashboard"

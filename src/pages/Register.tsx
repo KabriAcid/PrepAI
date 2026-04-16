@@ -253,7 +253,7 @@ export default function Register() {
 
             if (accountType === 'student') {
                 setIsLoading(false);
-                navigate('/login');
+                navigate('/student/dashboard');
             } else {
                 // For school admin, show success modal with server-provided details.
                 const totalAmount = schoolAdminFormData.numberOfStudents * 1000;

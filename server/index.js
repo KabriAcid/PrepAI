@@ -43,6 +43,37 @@ const templatePath = path.join(
     'school-admin-payment-instructions.html',
 );
 
+const resetTemplatePath = path.join(
+    ROOT_DIR,
+    'src',
+    'templates',
+    'emails',
+    'password-reset-instructions.html',
+);
+
+const RESET_TOKEN_TTL_MS = 1000 * 60 * 30;
+
+const DUMMY_USERS = [
+    {
+        role: 'student',
+        email: 'student@prepai.com',
+        password: 'student123',
+        name: 'Student User',
+    },
+    {
+        role: 'school_admin',
+        email: 'admin@prepai.com',
+        password: 'admin123',
+        name: 'School Admin User',
+    },
+];
+
+const userPasswords = new Map(
+    DUMMY_USERS.map((user) => [user.email.toLowerCase(), user.password]),
+);
+
+const resetTokens = new Map();
+
 function renderTemplate(template, variables) {
     return Object.entries(variables).reduce(
         (acc, [key, value]) => acc.replaceAll(`{{${key}}}`, String(value)),
@@ -56,6 +87,159 @@ function isEmail(value) {
 
 app.get('/api/health', (_req, res) => {
     res.json({ ok: true, service: 'registration-mail-api' });
+});
+
+app.post('/api/login', (req, res) => {
+    const payload = req.body || {};
+    const accountType = payload.account_type;
+    const email = String(payload.email || '').toLowerCase();
+    const password = String(payload.password || '');
+
+    if (!email || !password || !accountType) {
+        return res.status(400).json({
+            message: 'account_type, email and password are required.',
+        });
+    }
+
+    const user = DUMMY_USERS.find(
+        (item) => item.role === accountType && item.email.toLowerCase() === email,
+    );
+
+    if (!user) {
+        return res.status(401).json({
+            message: 'Invalid credentials for selected account type.',
+        });
+    }
+
+    const expectedPassword = userPasswords.get(email);
+    if (!expectedPassword || expectedPassword !== password) {
+        return res.status(401).json({
+            message: 'Invalid email or password.',
+        });
+    }
+
+    return res.status(200).json({
+        message: 'Login successful.',
+        data: {
+            account_type: accountType,
+            user: {
+                name: user.name,
+                email: user.email,
+            },
+            redirect_path:
+                accountType === 'school_admin'
+                    ? '/admin'
+                    : '/student/dashboard',
+        },
+    });
+});
+
+app.post('/api/forgot-password', async (req, res) => {
+    const payload = req.body || {};
+    const accountType = payload.account_type;
+    const email = String(payload.email || '').toLowerCase();
+
+    if (!accountType || !isEmail(email)) {
+        return res.status(400).json({
+            message: 'account_type and valid email are required.',
+        });
+    }
+
+    const matchedUser = DUMMY_USERS.find(
+        (user) => user.role === accountType && user.email.toLowerCase() === email,
+    );
+
+    // Return generic success response regardless of user existence.
+    if (!matchedUser) {
+        return res.status(200).json({
+            message:
+                'If the account exists, password reset instructions have been sent.',
+        });
+    }
+
+    try {
+        const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        const expiresAt = Date.now() + RESET_TOKEN_TTL_MS;
+        resetTokens.set(token, {
+            email,
+            accountType,
+            expiresAt,
+        });
+
+        const template = await fs.readFile(resetTemplatePath, 'utf8');
+        const resetBase = process.env.RESET_PASSWORD_LINK_BASE || `${APP_URL}/reset-password`;
+        const resetLink = `${resetBase}?token=${encodeURIComponent(token)}&role=${encodeURIComponent(accountType)}`;
+
+        const html = renderTemplate(template, {
+            base_url: APP_URL,
+            recipient_name: matchedUser.name,
+            account_type_label: accountType === 'school_admin' ? 'School Admin' : 'Student',
+            reset_link: resetLink,
+            expires_in: '30 minutes',
+            support_link: process.env.SUPPORT_LINK || `${APP_URL}/support`,
+            year: new Date().getFullYear(),
+        });
+
+        await transporter.sendMail({
+            from: getMailFrom(),
+            to: matchedUser.email,
+            subject: `${APP_NAME} password reset instructions`,
+            html,
+        });
+
+        return res.status(200).json({
+            message:
+                'If the account exists, password reset instructions have been sent.',
+        });
+    } catch (error) {
+        console.error('Failed to send password reset email:', error);
+        return res.status(500).json({
+            message:
+                'Unable to send password reset instructions right now. Please try again later.',
+        });
+    }
+});
+
+app.post('/api/reset-password', (req, res) => {
+    const payload = req.body || {};
+    const token = String(payload.token || '');
+    const password = String(payload.password || '');
+    const passwordConfirmation = String(payload.password_confirmation || '');
+
+    if (!token || !password || !passwordConfirmation) {
+        return res.status(400).json({
+            message: 'token, password and password_confirmation are required.',
+        });
+    }
+
+    if (password.length < 8) {
+        return res.status(400).json({
+            message: 'Password must be at least 8 characters.',
+        });
+    }
+
+    if (password !== passwordConfirmation) {
+        return res.status(400).json({
+            message: 'Password confirmation does not match.',
+        });
+    }
+
+    const tokenData = resetTokens.get(token);
+    if (!tokenData) {
+        return res.status(400).json({ message: 'Invalid or expired reset token.' });
+    }
+
+    if (Date.now() > tokenData.expiresAt) {
+        resetTokens.delete(token);
+        return res.status(400).json({ message: 'Invalid or expired reset token.' });
+    }
+
+    userPasswords.set(tokenData.email, password);
+    resetTokens.delete(token);
+
+    return res.status(200).json({
+        message: 'Password reset successful. You can now sign in with your new password.',
+    });
 });
 
 app.post('/api/register', async (req, res) => {
