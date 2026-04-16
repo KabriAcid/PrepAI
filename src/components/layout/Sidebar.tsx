@@ -8,7 +8,7 @@ const Sidebar: React.FC = () => {
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', to: '/student/dashboard' },
-    { icon: Trophy, label: 'Practice Tests', to: '/student/practice-tests' },
+    { icon: Trophy, label: 'Take Exam', to: '/student/exams' },
     { icon: BarChart3, label: 'Results', to: '/student/results' },
     { icon: TrendingUp, label: 'Performance', to: '/student/performance' },
     { icon: Layers, label: 'Subjects', to: '/student/subjects' },

@@ -1,13 +1,157 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Clock, Flag, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Clock, Flag, CheckCircle, Sparkles } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useQuiz } from '../context/QuizContext';
 import { Question, Quiz as QuizType } from '../types/quiz';
 import Button from '../components/ui/button';
 import ScoreBoard from '../components/ScoreBoard';
 import Modal from '../components/ui/Modal';
+import {
+  COMPULSORY_SUBJECT,
+  QUESTION_DISTRIBUTION,
+  createExamSetup,
+  loadExamSetup,
+} from '@/utils/exam-setup';
+
+type QuestionTemplate = {
+  question: string;
+  choices: string[];
+  correctAnswer: number;
+  explanation: string;
+};
+
+const SUBJECT_TEMPLATES: Record<string, QuestionTemplate[]> = {
+  [COMPULSORY_SUBJECT]: [
+    {
+      question: 'Choose the option that best completes the sentence: The chairman, together with his aides, ___ arriving shortly.',
+      choices: ['are', 'were', 'is', 'have'],
+      correctAnswer: 2,
+      explanation: 'The subject is "chairman" (singular), so the correct verb is "is".',
+    },
+    {
+      question: 'Identify the correctly punctuated sentence.',
+      choices: [
+        'After the game we went home.',
+        'After the game, we went home.',
+        'After, the game we went home.',
+        'After the game we, went home.',
+      ],
+      correctAnswer: 1,
+      explanation: 'A comma follows an introductory phrase: "After the game, ..."',
+    },
+  ],
+  Mathematics: [
+    {
+      question: 'If 3x + 5 = 20, find x.',
+      choices: ['3', '4', '5', '6'],
+      correctAnswer: 2,
+      explanation: '3x = 15, so x = 5.',
+    },
+    {
+      question: 'What is the value of 7^2 - 5^2?',
+      choices: ['12', '20', '24', '49'],
+      correctAnswer: 2,
+      explanation: '49 - 25 = 24.',
+    },
+  ],
+  Biology: [
+    {
+      question: 'Which organelle is responsible for energy production in cells?',
+      choices: ['Nucleus', 'Mitochondrion', 'Ribosome', 'Vacuole'],
+      correctAnswer: 1,
+      explanation: 'Mitochondria are the site of ATP production during respiration.',
+    },
+    {
+      question: 'The process by which green plants make food is called:',
+      choices: ['Respiration', 'Diffusion', 'Photosynthesis', 'Transpiration'],
+      correctAnswer: 2,
+      explanation: 'Photosynthesis uses sunlight, carbon dioxide and water to form glucose.',
+    },
+  ],
+  Chemistry: [
+    {
+      question: 'The pH of a neutral solution at room temperature is:',
+      choices: ['1', '7', '10', '14'],
+      correctAnswer: 1,
+      explanation: 'A neutral aqueous solution has pH 7.',
+    },
+    {
+      question: 'Which particle has a negative charge?',
+      choices: ['Proton', 'Neutron', 'Electron', 'Nucleus'],
+      correctAnswer: 2,
+      explanation: 'Electrons carry negative charge.',
+    },
+  ],
+  Physics: [
+    {
+      question: 'The SI unit of force is:',
+      choices: ['Joule', 'Pascal', 'Newton', 'Watt'],
+      correctAnswer: 2,
+      explanation: 'Force is measured in newtons (N).',
+    },
+    {
+      question: 'Speed is defined as distance divided by:',
+      choices: ['Time', 'Mass', 'Acceleration', 'Force'],
+      correctAnswer: 0,
+      explanation: 'Speed = distance / time.',
+    },
+  ],
+};
+
+const FALLBACK_SUBJECTS = ['Mathematics', 'Biology', 'Chemistry'];
+
+const getTemplatesForSubject = (subject: string): QuestionTemplate[] =>
+  SUBJECT_TEMPLATES[subject] ?? SUBJECT_TEMPLATES[COMPULSORY_SUBJECT];
+
+const buildExamQuestions = (subject: string, count: number, prefix: string): Question[] => {
+  const templates = getTemplatesForSubject(subject);
+  return Array.from({ length: count }, (_, i) => {
+    const template = templates[i % templates.length];
+    return {
+      id: `${prefix}-${i + 1}`,
+      type: 'mcq',
+      question: `${subject}: ${template.question}`,
+      choices: template.choices,
+      correctAnswer: template.correctAnswer,
+      explanation: template.explanation,
+      difficulty: i % 3 === 0 ? 'easy' : i % 3 === 1 ? 'medium' : 'hard',
+      category: 'quran',
+      points: 2,
+    };
+  });
+};
+
+const buildQuizFromSetup = (selectedSubjects: string[]): QuizType => {
+  const questions: Question[] = [
+    ...buildExamQuestions(
+      COMPULSORY_SUBJECT,
+      QUESTION_DISTRIBUTION[COMPULSORY_SUBJECT],
+      'english',
+    ),
+    ...selectedSubjects.flatMap((subject) =>
+      buildExamQuestions(
+        subject,
+        QUESTION_DISTRIBUTION.additionalSubject,
+        subject.toLowerCase().replace(/\s+/g, '-'),
+      ),
+    ),
+  ];
+
+  return {
+    id: `jamb-${selectedSubjects.join('-').toLowerCase().replace(/\s+/g, '-')}`,
+    title: 'JAMB Mock CBT',
+    description: 'AI-powered mock exam simulation',
+    timeLimit: 35 * 60,
+    category: 'jamb-cbt',
+    difficulty: 'medium',
+    totalPoints: questions.length * 2,
+    questions,
+  };
+};
 
 const Quiz: React.FC = () => {
+  const location = useLocation();
   const {
     currentQuiz,
     currentQuestionIndex,
@@ -28,58 +172,32 @@ const Quiz: React.FC = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | number>('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [timeWarning, setTimeWarning] = useState(false);
+  const [aiInsight, setAiInsight] = useState('');
+  const [showAiInsight, setShowAiInsight] = useState(false);
 
-  // Mock quiz data - in real app, this would come from API
-  const mockQuiz: QuizType = {
-    id: '1',
-    title: 'Quran Knowledge Test',
-    description: 'Test your knowledge of the Holy Quran',
-    timeLimit: 600, // 10 minutes
-    category: 'quran',
-    difficulty: 'medium',
-    totalPoints: 500,
-    questions: [
-      {
-        id: '1',
-        type: 'mcq',
-        question: 'How many chapters (Surahs) are there in the Quran?',
-        choices: ['112', '113', '114', '115'],
-        correctAnswer: 2,
-        explanation: 'The Quran contains 114 chapters (Surahs).',
-        difficulty: 'easy',
-        category: 'quran',
-        points: 10,
-      },
-      {
-        id: '2',
-        type: 'mcq',
-        question: 'Which Surah is known as the "Heart of the Quran"?',
-        choices: ['Al-Fatiha', 'Yasin', 'Al-Baqarah', 'Al-Ikhlas'],
-        correctAnswer: 1,
-        explanation: 'Surah Yasin is often referred to as the "Heart of the Quran".',
-        difficulty: 'medium',
-        category: 'quran',
-        points: 15,
-      },
-      {
-        id: '3',
-        type: 'fill-blank',
-        question: 'Complete the verse: "And whoever relies upon Allah - then He is _______ for him."',
-        correctAnswer: 'sufficient',
-        explanation: 'The complete verse is from Surah At-Talaq (65:3).',
-        difficulty: 'medium',
-        category: 'quran',
-        points: 20,
-      },
-    ],
-  };
+  const routeSetup = (location.state as { examSetup?: { selectedSubjects?: string[] } } | null)?.examSetup;
+
+  const selectedSubjects = useMemo(() => {
+    const fromRoute = routeSetup?.selectedSubjects;
+    if (fromRoute && fromRoute.length > 0) return fromRoute;
+
+    const fromStorage = loadExamSetup()?.selectedSubjects;
+    if (fromStorage && fromStorage.length > 0) return fromStorage;
+
+    return createExamSetup(FALLBACK_SUBJECTS).selectedSubjects;
+  }, [routeSetup]);
+
+  const mockQuiz = useMemo(
+    () => buildQuizFromSetup(selectedSubjects),
+    [selectedSubjects],
+  );
 
   // Initialize quiz on component mount
   useEffect(() => {
-    if (!currentQuiz) {
+    if (!currentQuiz || currentQuiz.id !== mockQuiz.id) {
       startQuiz(mockQuiz);
     }
-  }, [currentQuiz, startQuiz]);
+  }, [currentQuiz, mockQuiz, startQuiz]);
 
   // Handle timer warnings
   useEffect(() => {
@@ -94,6 +212,7 @@ const Quiz: React.FC = () => {
     if (currentQuestion) {
       const savedAnswer = answers[currentQuestion.id];
       setSelectedAnswer(savedAnswer || '');
+      setShowAiInsight(false);
     }
   }, [currentQuestionIndex, answers, getCurrentQuestion]);
 
@@ -172,6 +291,33 @@ const Quiz: React.FC = () => {
     setShowConfirmModal(false);
   };
 
+  const handleExplainWithAI = () => {
+    if (!currentQuestion) return;
+
+    const optionText =
+      currentQuestion.type === 'mcq' &&
+        currentQuestion.choices &&
+        typeof currentQuestion.correctAnswer === 'number'
+        ? currentQuestion.choices[currentQuestion.correctAnswer]
+        : String(currentQuestion.correctAnswer);
+
+    const hasAnswered = selectedAnswer !== '';
+    const isCorrect = hasAnswered && selectedAnswer === currentQuestion.correctAnswer;
+
+    const insight = [
+      `AI Explanation: ${currentQuestion.explanation || 'The best answer is the option that most directly satisfies the grammar, concept, or fact tested in this question.'}`,
+      hasAnswered
+        ? isCorrect
+          ? 'Great choice. Your selected answer matches the correct option.'
+          : `Your current answer is not the best fit. The correct answer is: ${optionText}.`
+        : `Tip: Focus on key words in the question stem. The correct answer is: ${optionText}.`,
+      'Exam strategy: Eliminate obviously wrong options first, then compare the remaining options against the exact wording of the question.',
+    ].join(' ');
+
+    setAiInsight(insight);
+    setShowAiInsight(true);
+  };
+
   const isLastQuestion = currentQuestionIndex === currentQuiz.questions.length - 1;
   const canGoNext = selectedAnswer !== '';
 
@@ -234,6 +380,15 @@ const Quiz: React.FC = () => {
                         {currentQuestion.arabicText}
                       </p>
                     )}
+
+                    <button
+                      type="button"
+                      onClick={handleExplainWithAI}
+                      className="mt-2 inline-flex items-center gap-2 rounded-lg border border-primary-200 bg-primary-50 px-3 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Explain with AI
+                    </button>
                   </div>
 
                   {/* Answer Options */}
@@ -247,14 +402,14 @@ const Quiz: React.FC = () => {
                             whileTap={{ scale: 0.98 }}
                             onClick={() => handleAnswerSelect(index)}
                             className={`w-full p-4 text-left rounded-xl border-2 transition-all ${selectedAnswer === index
-                                ? 'border-primary-500 bg-primary-50 text-primary-700'
-                                : 'border-spiritual-200 bg-white hover:border-spiritual-300'
+                              ? 'border-primary-500 bg-primary-50 text-primary-700'
+                              : 'border-spiritual-200 bg-white hover:border-spiritual-300'
                               }`}
                           >
                             <div className="flex items-center space-x-3">
                               <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${selectedAnswer === index
-                                  ? 'border-primary-500 bg-primary-500'
-                                  : 'border-spiritual-300'
+                                ? 'border-primary-500 bg-primary-500'
+                                : 'border-spiritual-300'
                                 }`}>
                                 {selectedAnswer === index && (
                                   <div className="w-2 h-2 bg-white rounded-full" />
@@ -279,6 +434,12 @@ const Quiz: React.FC = () => {
                       </div>
                     )}
                   </div>
+
+                  {showAiInsight && (
+                    <div className="rounded-xl border border-secondary-200 bg-secondary-50 p-4 text-sm leading-relaxed text-spiritual-700">
+                      {aiInsight}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -332,10 +493,10 @@ const Quiz: React.FC = () => {
                   <button
                     key={index}
                     className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${index === currentQuestionIndex
-                        ? 'bg-primary-500 text-white'
-                        : answers[currentQuiz.questions[index].id]
-                          ? 'bg-success-100 text-success-700 border border-success-300'
-                          : 'bg-spiritual-100 text-spiritual-600 hover:bg-spiritual-200'
+                      ? 'bg-primary-500 text-white'
+                      : answers[currentQuiz.questions[index].id]
+                        ? 'bg-success-100 text-success-700 border border-success-300'
+                        : 'bg-spiritual-100 text-spiritual-600 hover:bg-spiritual-200'
                       }`}
                   >
                     {index + 1}

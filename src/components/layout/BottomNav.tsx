@@ -6,7 +6,7 @@ import clsx from 'clsx'
 const BottomNav: React.FC = () => {
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard', to: '/student/dashboard' },
-    { icon: BookOpen, label: 'Practice', to: '/student/practice-tests' },
+    { icon: BookOpen, label: 'Take Exam', to: '/student/exams' },
     { icon: BarChart3, label: 'Results', to: '/student/results' },
     { icon: MoreHorizontal, label: 'More', to: '/student/settings' },
   ]

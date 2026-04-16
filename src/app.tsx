@@ -18,9 +18,11 @@ import AdminStudents from '@/pages/school-admin/Students';
 import AdminSubjects from '@/pages/school-admin/Subjects';
 import AdminSupport from '@/pages/school-admin/Support';
 import Dashboard from '@/pages/students/Dashboard';
+import ExamInstructions from '@/pages/students/ExamInstructions';
+import ExamSubjectSelection from '@/pages/students/ExamSubjectSelection';
+import ExamSummary from '@/pages/students/ExamSummary';
 import Help from '@/pages/students/Help';
 import Performance from '@/pages/students/Performance';
-import PracticeTests from '@/pages/students/PracticeTests';
 import Results from '@/pages/students/Results';
 import Settings from '@/pages/students/Settings';
 import Subjects from '@/pages/students/Subjects';
@@ -48,7 +50,26 @@ const App: React.FC = () => {
                 />
 
                 <Route path="/student/dashboard" element={<Dashboard />} />
-                <Route path="/student/exams" element={<PracticeTests />} />
+                <Route
+                    path="/student/exams"
+                    element={<Navigate to="/student/exams/instructions" replace />}
+                />
+                <Route
+                    path="/student/practice-tests"
+                    element={<Navigate to="/student/exams/instructions" replace />}
+                />
+                <Route
+                    path="/student/exams/instructions"
+                    element={<ExamInstructions />}
+                />
+                <Route
+                    path="/student/exams/subjects"
+                    element={<ExamSubjectSelection />}
+                />
+                <Route
+                    path="/student/exams/summary"
+                    element={<ExamSummary />}
+                />
                 <Route path="/student/quiz" element={<Quiz />} />
                 <Route path="/student/results" element={<Results />} />
                 <Route path="/student/performance" element={<Performance />} />
