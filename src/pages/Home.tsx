@@ -186,13 +186,13 @@ const Home: React.FC = () => {
                                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                                 </Link>
 
-                                <a
-                                    href="#featured-exams"
+                                <Link
+                                    to="/leaderboard"
                                     className="inline-flex items-center rounded-xl border border-spiritual-200 bg-white px-6 py-3 text-base font-medium text-spiritual-700 shadow-soft transition-all duration-300 hover:border-spiritual-300 hover:shadow-medium"
                                 >
                                     <Trophy className="mr-2 h-5 w-5" />
                                     View Leaderboard
-                                </a>
+                                </Link>
                             </motion.div>
                         </motion.div>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Home from '@/pages/Home';
+import Leaderboard from '@/pages/Leaderboard';
 import Login from '@/pages/Login';
 import Quiz from '@/pages/Quiz';
 import Register from '@/pages/Register';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/home" element={<Home />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route
