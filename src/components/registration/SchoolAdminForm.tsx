@@ -3,8 +3,6 @@ import {
     AlertCircle,
     Building2,
     Info,
-    Lock,
-    LockKeyhole,
     Mail,
     Map,
     MapPin,
@@ -282,72 +280,10 @@ export default function SchoolAdminForm({
                 </motion.div>
             )}
 
-            {/* Step 3: Security */}
+            {/* Step 3: Review & Confirm */}
             {currentStep === 3 && (
                 <motion.div
                     key="step3"
-                    {...fadeInScale}
-                    className="space-y-4 sm:space-y-5"
-                >
-                    {/* 2x2 Grid Layout */}
-                    <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
-                        {/* Password */}
-                        <div>
-                            <div className="relative">
-                                <Lock className="input-icon" />
-                                <input
-                                    type="password"
-                                    value={formData.password}
-                                    onChange={(e) =>
-                                        onChange('password', e.target.value)
-                                    }
-                                    placeholder="Password"
-                                    className="input-field-icon"
-                                    required
-                                />
-                            </div>
-                            <p className="mt-1 text-xs text-spiritual-500">
-                                Min 8 characters
-                            </p>
-                            {errors.password && (
-                                <span className="mt-1 block text-sm text-error-600">
-                                    {errors.password}
-                                </span>
-                            )}
-                        </div>
-
-                        {/* Confirm Password */}
-                        <div>
-                            <div className="relative">
-                                <LockKeyhole className="input-icon" />
-                                <input
-                                    type="password"
-                                    value={formData.password_confirmation}
-                                    onChange={(e) =>
-                                        onChange(
-                                            'password_confirmation',
-                                            e.target.value,
-                                        )
-                                    }
-                                    placeholder="Confirm Password"
-                                    className="input-field-icon"
-                                    required
-                                />
-                            </div>
-                            {errors.password_confirmation && (
-                                <span className="mt-1 block text-sm text-error-600">
-                                    {errors.password_confirmation}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                </motion.div>
-            )}
-
-            {/* Step 4: Review & Confirm */}
-            {currentStep === 4 && (
-                <motion.div
-                    key="step4"
                     {...fadeInScale}
                     className="space-y-4 sm:space-y-6"
                 >

@@ -66,9 +66,9 @@ app.post('/api/register', async (req, res) => {
     }
 
     if (payload.account_type === 'student') {
-        if (!payload.name || !isEmail(payload.email) || !payload.password) {
+        if (!payload.name || !isEmail(payload.email)) {
             return res.status(400).json({
-                message: 'Student registration requires valid name, email and password.',
+                message: 'Student registration requires valid name and email.',
             });
         }
 

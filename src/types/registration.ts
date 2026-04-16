@@ -3,8 +3,6 @@ export type AccountType = 'student' | 'school_admin' | null;
 export interface StudentFormData {
     name: string;
     email: string;
-    password: string;
-    password_confirmation: string;
 }
 
 export interface SchoolAdminFormData {
@@ -16,8 +14,6 @@ export interface SchoolAdminFormData {
     schoolName: string;
     schoolAddress: string;
     numberOfStudents: number;
-    password: string;
-    password_confirmation: string;
 }
 
 export interface RegistrationData {

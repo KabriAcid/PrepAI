@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Lock, LockKeyhole, Mail, User } from 'lucide-react';
+import { Mail, User } from 'lucide-react';
 import type { StudentFormData } from '../../types/registration';
 
 interface StudentFormProps {
@@ -77,62 +77,6 @@ export default function StudentForm({
             {currentStep === 2 && (
                 <motion.div
                     key="step2"
-                    {...fadeInScale}
-                    className="space-y-4 sm:space-y-5"
-                >
-                    <div>
-                        <div className="relative">
-                            <Lock className="input-icon" />
-                            <input
-                                type="password"
-                                value={formData.password}
-                                onChange={(e) =>
-                                    onChange('password', e.target.value)
-                                }
-                                placeholder="Password"
-                                className="w-full rounded-xl border border-spiritual-300 py-3 pl-10 pr-4 text-sm focus:border-transparent focus:ring-2 focus:ring-primary-500 sm:text-base"
-                                required
-                            />
-                        </div>
-                        <p className="mt-1 text-xs text-spiritual-500">
-                            Minimum 8 characters
-                        </p>
-                        {errors.password && (
-                            <span className="mt-1 block text-sm text-error-600">
-                                {errors.password}
-                            </span>
-                        )}
-                    </div>
-
-                    <div>
-                        <div className="relative">
-                            <LockKeyhole className="input-icon" />
-                            <input
-                                type="password"
-                                value={formData.password_confirmation}
-                                onChange={(e) =>
-                                    onChange(
-                                        'password_confirmation',
-                                        e.target.value,
-                                    )
-                                }
-                                placeholder="Confirm Password"
-                                className="w-full rounded-xl border border-spiritual-300 py-3 pl-10 pr-4 text-sm focus:border-transparent focus:ring-2 focus:ring-primary-500 sm:text-base"
-                                required
-                            />
-                        </div>
-                        {errors.password_confirmation && (
-                            <span className="mt-1 block text-sm text-error-600">
-                                {errors.password_confirmation}
-                            </span>
-                        )}
-                    </div>
-                </motion.div>
-            )}
-
-            {currentStep === 3 && (
-                <motion.div
-                    key="step3"
                     {...fadeInScale}
                     className="space-y-4 sm:space-y-6"
                 >

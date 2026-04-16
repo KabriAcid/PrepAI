@@ -3,7 +3,6 @@ import {
     BookOpenCheck,
     Building2,
     ClipboardCheck,
-    Lock,
     UserRound,
 } from 'lucide-react';
 import type { AccountType } from '../../types/registration';
@@ -19,11 +18,6 @@ const studentSteps = [
         title: 'Personal Info',
         subtitle: 'Please provide your personal details',
         icon: UserRound,
-    },
-    {
-        title: 'Account Security',
-        subtitle: 'Create a secure password to protect your account',
-        icon: Lock,
     },
     {
         title: 'Review & Confirm',
@@ -42,11 +36,6 @@ const adminSteps = [
         title: 'School Details',
         subtitle: 'Enter school profile, location and capacity',
         icon: Building2,
-    },
-    {
-        title: 'Account Security',
-        subtitle: 'Set credentials for secure dashboard access',
-        icon: Lock,
     },
     {
         title: 'Review & Confirm',

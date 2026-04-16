@@ -69,8 +69,6 @@ export default function Register() {
     const [studentFormData, setStudentFormData] = useState<StudentFormData>({
         name: '',
         email: '',
-        password: '',
-        password_confirmation: '',
     });
 
     const [schoolAdminFormData, setSchoolAdminFormData] =
@@ -83,11 +81,9 @@ export default function Register() {
             schoolName: '',
             schoolAddress: '',
             numberOfStudents: 100,
-            password: '',
-            password_confirmation: '',
         });
 
-    const totalSteps = accountType === 'student' ? 3 : 4;
+    const totalSteps = accountType === 'student' ? 2 : 3;
 
     const handleAccountTypeSelect = (type: AccountType) => {
         setAccountType(type);
@@ -139,22 +135,6 @@ export default function Register() {
                     newErrors.email = 'Please enter a valid email';
                 }
             } else if (currentStep === 2) {
-                if (!studentFormData.password) {
-                    newErrors.password = 'Password is required';
-                } else if (studentFormData.password.length < 8) {
-                    newErrors.password =
-                        'Password must be at least 8 characters';
-                }
-                if (!studentFormData.password_confirmation) {
-                    newErrors.password_confirmation =
-                        'Please confirm your password';
-                } else if (
-                    studentFormData.password !==
-                    studentFormData.password_confirmation
-                ) {
-                    newErrors.password_confirmation = 'Passwords do not match';
-                }
-            } else if (currentStep === 3) {
                 if (!agreeToTerms) {
                     newErrors.agreeToTerms =
                         'You must agree to the terms and conditions';
@@ -196,22 +176,6 @@ export default function Register() {
                         'Number of students must be between 10 and 10,000';
                 }
             } else if (currentStep === 3) {
-                if (!schoolAdminFormData.password) {
-                    newErrors.password = 'Password is required';
-                } else if (schoolAdminFormData.password.length < 8) {
-                    newErrors.password =
-                        'Password must be at least 8 characters';
-                }
-                if (!schoolAdminFormData.password_confirmation) {
-                    newErrors.password_confirmation =
-                        'Please confirm your password';
-                } else if (
-                    schoolAdminFormData.password !==
-                    schoolAdminFormData.password_confirmation
-                ) {
-                    newErrors.password_confirmation = 'Passwords do not match';
-                }
-            } else if (currentStep === 4) {
                 if (!agreeToTerms) {
                     newErrors.agreeToTerms =
                         'You must agree to the terms and conditions';
@@ -252,9 +216,6 @@ export default function Register() {
                         account_type: 'student',
                         name: studentFormData.name,
                         email: studentFormData.email,
-                        password: studentFormData.password,
-                        password_confirmation:
-                            studentFormData.password_confirmation,
                     }
                     : {
                         account_type: 'school_admin',
@@ -267,9 +228,6 @@ export default function Register() {
                         school_address: schoolAdminFormData.schoolAddress,
                         number_of_students:
                             schoolAdminFormData.numberOfStudents,
-                        password: schoolAdminFormData.password,
-                        password_confirmation:
-                            schoolAdminFormData.password_confirmation,
                     };
 
             const response = await fetch('/api/register', {
