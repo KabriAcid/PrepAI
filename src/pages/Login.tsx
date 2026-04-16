@@ -8,22 +8,6 @@ import Input from '../components/ui/input';
 
 type AccountType = 'student' | 'school_admin';
 
-const DUMMY_CREDENTIALS: Record<
-    AccountType,
-    { email: string; password: string; redirectPath: string }
-> = {
-    student: {
-        email: 'student@prepai.com',
-        password: 'student123',
-        redirectPath: '/student/dashboard',
-    },
-    school_admin: {
-        email: 'admin@prepai.com',
-        password: 'admin123',
-        redirectPath: '/admin',
-    },
-};
-
 const Login: React.FC = () => {
     const navigate = useNavigate();
     const [accountType, setAccountType] = useState<AccountType>('student');
@@ -86,20 +70,6 @@ const Login: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const attemptDummyLogin = (): string | null => {
-        const selectedCredentials = DUMMY_CREDENTIALS[accountType];
-        const inputEmail = formData.email.trim().toLowerCase();
-
-        if (
-            inputEmail === selectedCredentials.email &&
-            formData.password === selectedCredentials.password
-        ) {
-            return selectedCredentials.redirectPath;
-        }
-
-        return null;
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -125,12 +95,6 @@ const Login: React.FC = () => {
             const payload = await response.json().catch(() => ({}));
 
             if (!response.ok) {
-                const fallbackRedirect = attemptDummyLogin();
-                if (fallbackRedirect) {
-                    navigate(fallbackRedirect);
-                    return;
-                }
-
                 setErrors({
                     email: payload?.errors?.email?.[0] ?? '',
                     password: payload?.errors?.password?.[0] ?? '',
@@ -148,15 +112,9 @@ const Login: React.FC = () => {
 
             navigate(redirectPath);
         } catch {
-            const fallbackRedirect = attemptDummyLogin();
-            if (fallbackRedirect) {
-                navigate(fallbackRedirect);
-                return;
-            }
-
             setErrors({
                 general:
-                    'Unable to sign in with those credentials. Check your account type and try again.',
+                    'Network error. Please check your connection and retry.',
             });
         } finally {
             setIsLoading(false);
@@ -256,16 +214,6 @@ const Login: React.FC = () => {
                             <School className="h-4 w-4" />
                             School Admin
                         </button>
-                    </div>
-
-                    <div className="mb-5 rounded-xl border border-secondary-200 bg-secondary-50 px-4 py-3 text-xs text-spiritual-700 sm:text-sm">
-                        <p className="font-semibold text-spiritual-800">Dummy Login Credentials</p>
-                        <p>
-                            Student: student@prepai.com / student123
-                        </p>
-                        <p>
-                            School Admin: admin@prepai.com / admin123
-                        </p>
                     </div>
 
                     {/* Form */}

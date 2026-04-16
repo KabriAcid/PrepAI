@@ -53,24 +53,7 @@ const resetTemplatePath = path.join(
 
 const RESET_TOKEN_TTL_MS = 1000 * 60 * 30;
 
-const DUMMY_USERS = [
-    {
-        role: 'student',
-        email: 'student@prepai.com',
-        password: 'student123',
-        name: 'Student User',
-    },
-    {
-        role: 'school_admin',
-        email: 'admin@prepai.com',
-        password: 'admin123',
-        name: 'School Admin User',
-    },
-];
-
-const userPasswords = new Map(
-    DUMMY_USERS.map((user) => [user.email.toLowerCase(), user.password]),
-);
+const userPasswords = new Map();
 
 const resetTokens = new Map();
 
@@ -101,21 +84,16 @@ app.post('/api/login', (req, res) => {
         });
     }
 
-    const user = DUMMY_USERS.find(
-        (item) => item.role === accountType && item.email.toLowerCase() === email,
-    );
-
-    if (!user) {
-        return res.status(401).json({
-            message: 'Invalid credentials for selected account type.',
-        });
-    }
-
     const expectedPassword = userPasswords.get(email);
-    if (!expectedPassword || expectedPassword !== password) {
+    if (expectedPassword && expectedPassword !== password) {
         return res.status(401).json({
             message: 'Invalid email or password.',
         });
+    }
+
+    // First successful login for an email creates an in-memory credential.
+    if (!expectedPassword) {
+        userPasswords.set(email, password);
     }
 
     return res.status(200).json({
@@ -123,8 +101,8 @@ app.post('/api/login', (req, res) => {
         data: {
             account_type: accountType,
             user: {
-                name: user.name,
-                email: user.email,
+                name: email.split('@')[0] || 'User',
+                email,
             },
             redirect_path:
                 accountType === 'school_admin'
@@ -145,18 +123,6 @@ app.post('/api/forgot-password', async (req, res) => {
         });
     }
 
-    const matchedUser = DUMMY_USERS.find(
-        (user) => user.role === accountType && user.email.toLowerCase() === email,
-    );
-
-    // Return generic success response regardless of user existence.
-    if (!matchedUser) {
-        return res.status(200).json({
-            message:
-                'If the account exists, password reset instructions have been sent.',
-        });
-    }
-
     try {
         const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
         const expiresAt = Date.now() + RESET_TOKEN_TTL_MS;
@@ -172,7 +138,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
         const html = renderTemplate(template, {
             base_url: APP_URL,
-            recipient_name: matchedUser.name,
+            recipient_name: email.split('@')[0] || 'User',
             account_type_label: accountType === 'school_admin' ? 'School Admin' : 'Student',
             reset_link: resetLink,
             expires_in: '30 minutes',
@@ -182,7 +148,7 @@ app.post('/api/forgot-password', async (req, res) => {
 
         await transporter.sendMail({
             from: getMailFrom(),
-            to: matchedUser.email,
+            to: email,
             subject: `${APP_NAME} password reset instructions`,
             html,
         });
