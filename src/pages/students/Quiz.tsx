@@ -365,11 +365,10 @@ const Quiz: React.FC = () => {
                           Q{index + 1}. {question.question}
                         </p>
                         <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                            isCorrect
+                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ${isCorrect
                               ? 'bg-success-100 text-success-700'
                               : 'bg-error-100 text-error-700'
-                          }`}
+                            }`}
                         >
                           {isCorrect ? 'Correct' : 'Incorrect'}
                         </span>
