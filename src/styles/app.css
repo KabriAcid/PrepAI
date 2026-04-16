@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Styles */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family:
+        'Plus Jakarta Sans',
+        system-ui,
+        -apple-system,
+        'Segoe UI',
+        sans-serif;
+    line-height: 1.6;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    min-height: 100vh;
+}
+
+select:focus,
+textarea:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+select {
+    outline: none !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Utility Classes */
+.text-gradient {
+    background: linear-gradient(135deg, #0ea5e9, #d946ef);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.glass-effect {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+}
+
+/* Islamic Pattern Background */
+.islamic-bg {
+    background-image:
+        radial-gradient(circle at 25% 25%,
+            rgba(14, 165, 233, 0.1) 0%,
+            transparent 50%),
+        radial-gradient(circle at 75% 75%,
+            rgba(217, 70, 239, 0.1) 0%,
+            transparent 50%);
+}
+
+/* Animation Classes */
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Button Styles */
+.btn-primary {
+    @apply rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 font-medium text-white shadow-medium transition-all duration-300 hover:scale-105 hover:shadow-strong active:scale-95;
+}
+
+.btn-secondary {
+    @apply rounded-xl border border-spiritual-200 bg-white px-6 py-3 font-medium text-spiritual-700 shadow-soft transition-all duration-300 hover:border-spiritual-300 hover:shadow-medium;
+}
+
+.btn-ghost {
+    @apply rounded-xl px-6 py-3 font-medium text-spiritual-600 transition-all duration-300 hover:bg-white/50;
+}
+
+/* Input Styles */
+.input-field,
+.text-area {
+    @apply w-full rounded-xl border border-spiritual-200 bg-white/80 px-4 py-3 placeholder-spiritual-400 outline-none backdrop-blur-sm transition-all duration-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20;
+}
+
+.input-field-icon {
+    @apply w-full rounded-xl border border-spiritual-300 bg-white/80 py-3 pl-10 pr-4 text-sm placeholder-spiritual-400 outline-none backdrop-blur-sm transition-all duration-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 sm:text-base;
+}
+
+.select-field {
+    @apply w-full rounded-xl border border-spiritual-300 bg-white/80 py-3 pl-10 pr-4 text-sm outline-none backdrop-blur-sm transition-all duration-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-50 sm:text-base;
+}
+
+.textarea-field {
+    @apply w-full resize-none rounded-xl border border-spiritual-300 bg-white/80 py-3 pl-10 pr-4 text-sm placeholder-spiritual-400 outline-none backdrop-blur-sm transition-all duration-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 sm:text-base;
+}
+
+/* Card Styles */
+.quiz-card {
+    @apply card-hover rounded-2xl border border-white/20 bg-white/90 p-6 shadow-soft backdrop-blur-sm;
+}
+
+.card-container {
+    @apply rounded-2xl border border-white/20 bg-white/90 p-4 shadow-strong backdrop-blur-sm sm:rounded-3xl sm:p-6 md:p-8;
+}
+
+/* Button Styles - Secondary/Navigation */
+.btn-back {
+    @apply inline-flex items-center rounded-xl bg-spiritual-100 px-4 py-2 text-sm font-medium text-spiritual-700 transition-all duration-300 hover:bg-spiritual-200 sm:px-6 sm:py-3 sm:text-base;
+}
+
+.btn-continue {
+    @apply inline-flex items-center rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-3 text-sm font-medium text-white shadow-medium transition-all duration-300 hover:shadow-strong disabled:cursor-not-allowed disabled:opacity-50 sm:px-8 sm:py-3.5 sm:text-base;
+}
+
+/* Form Alert Styles */
+.error-alert {
+    @apply rounded-xl border border-error-200 bg-error-50 p-3 text-sm text-error-600;
+}
+
+/* Progress Bar */
+.progress-bar {
+    @apply h-2 w-full overflow-hidden rounded-full bg-spiritual-200;
+}
+
+.progress-fill {
+    @apply h-full rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 transition-all duration-500 ease-out;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+    body {
+        font-size: 14px;
+    }
+
+    .quiz-card {
+        @apply rounded-xl p-4;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        @apply px-5 py-3 text-sm;
+    }
+}
